@@ -55,3 +55,14 @@ export async function signIn(input: { email: string; password: string }) {
     createdAt: user.createdAt,
   };
 }
+
+export async function getUserById(id: string) {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, name: true, createdAt: true },
+  });
+  if (!user) {
+    throw new AuthError("User not found", "INVALID_CREDENTIALS");
+  }
+  return user;
+}

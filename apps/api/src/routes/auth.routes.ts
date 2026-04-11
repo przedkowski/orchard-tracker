@@ -1,6 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { signUp, signIn, AuthError } from "../services/auth.service.js";
+import {
+  signUp,
+  signIn,
+  getUserById,
+  AuthError,
+} from "../services/auth.service.js";
 
 const signUpBody = z.object({
   email: z.string().email(),
@@ -54,7 +59,16 @@ export async function authRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get("/auth/me", { preHandler: [app.authenticate] }, async (request) => {
-    return { userId: request.userId };
-  });
+  app.get(
+    "/auth/me",
+    { preHandler: [app.authenticate] },
+    async (request, reply) => {
+      try {
+        const user = await getUserById(request.userId);
+        return { user };
+      } catch {
+        return reply.code(401).send({ error: "Unauthorized" });
+      }
+    },
+  );
 }
