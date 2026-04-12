@@ -5,6 +5,9 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   JWT_SECRET: z.string().min(16, "JWT_SECRET must be at least 16 characters"),
   GROQ_API_KEY: z.string().optional().default(""),
+  LOKI_URL: z.string().url().optional(),
+  LOKI_USER: z.string().optional(),
+  LOKI_PASSWORD: z.string().optional(),
   PORT: z.coerce.number().int().positive().default(3001),
   NODE_ENV: z
     .enum(["development", "test", "production"])
