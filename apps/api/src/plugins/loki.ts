@@ -43,8 +43,14 @@ const lokiPlugin: FastifyPluginAsync = async (app) => {
         Authorization: `Basic ${auth}`,
       },
       body: JSON.stringify(entry),
+    }).then((res) => {
+      if (!res.ok) {
+        res.text().then((body) => {
+          app.log.error({ status: res.status, body }, "Loki push failed");
+        });
+      }
     }).catch((err) => {
-      app.log.warn({ err }, "Failed to push log to Loki");
+      app.log.error({ err }, "Loki fetch error");
     });
 
     done();
