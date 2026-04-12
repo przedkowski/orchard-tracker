@@ -1,3 +1,4 @@
+import fp from "fastify-plugin";
 import type { FastifyPluginAsync } from "fastify";
 import { env } from "../env.js";
 
@@ -60,4 +61,4 @@ const lokiPlugin: FastifyPluginAsync = async (app) => {
   });
 };
 
-export default lokiPlugin;
+export default fp(lokiPlugin);
