@@ -4,7 +4,11 @@ import { env } from "../env.js";
 // Fire-and-forget request log shipper to Grafana Loki.
 // Only activates when LOKI_URL + LOKI_USER + LOKI_PASSWORD are all set.
 const lokiPlugin: FastifyPluginAsync = async (app) => {
-  if (!env.LOKI_URL || !env.LOKI_USER || !env.LOKI_PASSWORD) return;
+  if (!env.LOKI_URL || !env.LOKI_USER || !env.LOKI_PASSWORD) {
+    app.log.warn("Loki plugin: missing credentials, skipping");
+    return;
+  }
+  app.log.info({ pushUrl: `${env.LOKI_URL}/loki/api/v1/push` }, "Loki plugin active");
 
   const auth = Buffer.from(`${env.LOKI_USER}:${env.LOKI_PASSWORD}`).toString(
     "base64",
