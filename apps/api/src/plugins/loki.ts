@@ -48,6 +48,7 @@ const lokiPlugin: FastifyPluginAsync = async (app) => {
       },
       body: JSON.stringify(entry),
     }).then((res) => {
+      app.log.info({ status: res.status }, "Loki push response");
       if (!res.ok) {
         res.text().then((body) => {
           app.log.error({ status: res.status, body }, "Loki push failed");
