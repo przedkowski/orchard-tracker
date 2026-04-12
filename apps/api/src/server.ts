@@ -1,45 +1,18 @@
-import { createRequire } from "module";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import sensible from "@fastify/sensible";
 import { env } from "./env.js";
-
-const _require = createRequire(import.meta.url);
 import authPlugin from "./plugins/auth.js";
+import lokiPlugin from "./plugins/loki.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { sectionsRoutes } from "./routes/sections.routes.js";
 import { spraysRoutes } from "./routes/sprays.routes.js";
 import { suggestionsRoutes } from "./routes/suggestions.routes.js";
 
-function buildLoggerConfig() {
-  if (env.NODE_ENV === "test") return { level: "silent" as const };
-
-  if (env.LOKI_URL && env.LOKI_USER && env.LOKI_PASSWORD) {
-    return {
-      level: "info" as const,
-      transport: {
-        targets: [
-          { target: "pino/file", level: "info", options: { destination: 1 } },
-          {
-            target: _require.resolve("pino-loki"),
-            level: "info",
-            options: {
-              host: env.LOKI_URL,
-              basicAuth: { username: env.LOKI_USER, password: env.LOKI_PASSWORD },
-              labels: { app: "orchard-tracker", env: env.NODE_ENV },
-              silenceErrors: false,
-            },
-          },
-        ],
-      },
-    };
-  }
-
-  return { level: "info" as const };
-}
-
 export async function buildApp() {
-  const app = Fastify({ logger: buildLoggerConfig() });
+  const app = Fastify({
+    logger: { level: env.NODE_ENV === "test" ? "silent" : "info" },
+  });
 
   await app.register(sensible);
   await app.register(cors, {
@@ -48,6 +21,7 @@ export async function buildApp() {
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   });
   await app.register(authPlugin);
+  await app.register(lokiPlugin);
 
   app.get("/health", async () => ({
     status: "ok",
