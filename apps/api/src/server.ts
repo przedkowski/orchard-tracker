@@ -1,7 +1,10 @@
+import { createRequire } from "module";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import sensible from "@fastify/sensible";
 import { env } from "./env.js";
+
+const _require = createRequire(import.meta.url);
 import authPlugin from "./plugins/auth.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { sectionsRoutes } from "./routes/sections.routes.js";
@@ -18,7 +21,7 @@ function buildLoggerConfig() {
         targets: [
           { target: "pino/file", level: "info", options: { destination: 1 } },
           {
-            target: "pino-loki",
+            target: _require.resolve("pino-loki"),
             level: "info",
             options: {
               host: env.LOKI_URL,
