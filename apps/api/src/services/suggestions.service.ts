@@ -8,6 +8,8 @@ export interface Suggestion {
   reason: string;
   suggestedWindow: string;
   priority: "low" | "medium" | "high";
+  sectionName?: string;
+  category?: string;
 }
 
 const suggestionSchema = z.object({
@@ -15,6 +17,8 @@ const suggestionSchema = z.object({
   reason: z.string(),
   suggestedWindow: z.string(),
   priority: z.enum(["low", "medium", "high"]),
+  sectionName: z.string().optional(),
+  category: z.string().optional(),
 });
 
 const suggestionsArraySchema = z.array(suggestionSchema).max(8);
@@ -91,6 +95,8 @@ async function groqSuggestions(
           "return a JSON object with a single key \"suggestions\" containing an array of up to 5 actionable spray suggestions. " +
           "Each suggestion must have: " +
           "title (string), reason (string), suggestedWindow (string), priority (\"low\"|\"medium\"|\"high\"). " +
+          "When a suggestion targets a specific section, include sectionName (string, must match a section name exactly). " +
+          "When a suggestion targets a specific spray category, include category (one of: Fungicide, Insecticide, Herbicide, Fertilizer, Other). " +
           "Base advice on typical integrated pest management (IPM) intervals. " +
           "Return ONLY the JSON object, no markdown, no explanation.",
       },
@@ -133,6 +139,8 @@ function ruleBasedSuggestions(sections: SectionWithSprays[]): Suggestion[] {
           : `No fungicide recorded for ${section.cropType} in this section yet.`,
         suggestedWindow: "Within the next 3-5 days",
         priority: "medium",
+        sectionName: section.name,
+        category: "Fungicide",
       });
     }
 
@@ -147,6 +155,8 @@ function ruleBasedSuggestions(sections: SectionWithSprays[]): Suggestion[] {
           : `No insecticide recorded yet. Monitor pest pressure.`,
         suggestedWindow: "Within the next week",
         priority: "low",
+        sectionName: section.name,
+        category: "Insecticide",
       });
     }
   }

@@ -97,10 +97,25 @@ Section and spray ids are `string`, not number.
 
 ## What's still left (high-level)
 
-- Frontend pages: `Sections.tsx` ✅, `SectionDetail.tsx`, `Sprays.tsx`,
-  wire up `App.tsx` routing with AuthProvider + QueryClientProvider
+- Frontend pages: `Sections.tsx` ✅, `SectionDetail.tsx` ✅, `Sprays.tsx` ✅,
+  wire up `App.tsx` routing with AuthProvider + QueryClientProvider ✅
 - Replace rule-based suggestions with Groq integration
 - Deploy api (Fly.io) and web (Vercel)
 - GitHub Actions CI/CD
 - Grafana Cloud hookup
 - At least 8 distinct E2E user paths must be possible by the end
+
+## Implemented features
+
+- Batch spray — log the same spray across multiple sections at once ✅
+- PHI tracker — Pre-Harvest Interval countdown badge + section-level safety banner ✅
+- Product & crop type autocomplete — DB-backed dictionaries with per-category filtering ✅
+
+## Feature backlog (not yet started)
+
+- Export to CSV — download spray history for regulatory records
+- Spray calendar / timeline view — visualize spray frequency per section
+- Section map / area visualization — simple visual layout of orchard blocks
+- Low-stock / reorder alerts — flag products running low
+- Weather integration — auto-fill weather note from a weather API
+- Spray report by section — summary of total doses, products used, last spray date

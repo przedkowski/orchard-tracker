@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { NavBar } from "../components/NavBar";
 import { Card } from "../components/Card";
+import { Button } from "../components/Button";
+import { SprayModal } from "../components/SprayModal";
 import { useAuth } from "../hooks/useAuth";
 import { listSections } from "../api/sections";
 import { listSprays } from "../api/sprays";
 import { getSuggestions } from "../api/suggestions";
+import type { Suggestion } from "../types";
 
 const priorityColors: Record<string, string> = {
   high: "bg-red-900/40 text-red-400",
@@ -15,6 +19,7 @@ const priorityColors: Record<string, string> = {
 
 export function Dashboard() {
   const { user } = useAuth();
+  const [applyingSuggestion, setApplyingSuggestion] = useState<Suggestion | null>(null);
 
   const sectionsQuery = useQuery({
     queryKey: ["sections"],
@@ -37,6 +42,12 @@ export function Dashboard() {
 
   return (
     <div data-testid="dashboard-page" className="min-h-screen bg-slate-950">
+      {applyingSuggestion && (
+        <SprayModal
+          suggestion={applyingSuggestion}
+          onClose={() => setApplyingSuggestion(null)}
+        />
+      )}
       <NavBar />
       <main className="mx-auto max-w-5xl px-4 py-8">
         <div className="mb-8">
@@ -208,6 +219,15 @@ export function Dashboard() {
                           >
                             {s.priority}
                           </span>
+                        </div>
+                        <div className="mt-3">
+                          <Button
+                            size="sm"
+                            data-testid={`suggestion-apply-${i}`}
+                            onClick={() => setApplyingSuggestion(s)}
+                          >
+                            Apply
+                          </Button>
                         </div>
                       </Card>
                     </li>

@@ -46,6 +46,8 @@ export interface Suggestion {
   reason: string;
   suggestedWindow: string;
   priority: "low" | "medium" | "high";
+  sectionName?: string;
+  category?: string;
 }
 
 export interface ApiError {
