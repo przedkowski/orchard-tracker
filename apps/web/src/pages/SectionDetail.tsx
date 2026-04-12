@@ -5,10 +5,71 @@ import { NavBar } from "../components/NavBar";
 import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { PhiBadge } from "../components/PhiBadge";
+import { Combobox } from "../components/Combobox";
+import { CROP_TYPES } from "../constants/cropTypes";
 import { getSection, updateSection } from "../api/sections";
 import { listSprays, deleteSpray } from "../api/sprays";
 import { HttpError } from "../api/client";
-import type { OrchardSection } from "../types";
+import type { OrchardSection, SprayRecord } from "../types";
+
+// Computes the most restrictive active PHI across all sprays for this section.
+function PhiStatusBanner({ sprays }: { sprays: SprayRecord[] }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let latestClear: Date | null = null;
+  for (const spray of sprays) {
+    if (spray.phiDays == null) continue;
+    const clearDate = new Date(spray.sprayedAt);
+    clearDate.setDate(clearDate.getDate() + spray.phiDays);
+    clearDate.setHours(0, 0, 0, 0);
+    if (clearDate > today && (!latestClear || clearDate > latestClear)) {
+      latestClear = clearDate;
+    }
+  }
+
+  const hasPhi = sprays.some((s) => s.phiDays != null);
+  if (!hasPhi) return null;
+
+  if (latestClear) {
+    const daysLeft = Math.ceil(
+      (latestClear.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
+    return (
+      <div
+        data-testid="section-phi-banner"
+        className="mb-6 flex items-start gap-3 rounded-xl border border-amber-700/50 bg-amber-900/20 px-4 py-3"
+      >
+        <span className="mt-0.5 text-lg">⚠️</span>
+        <div>
+          <p className="text-sm font-semibold text-amber-300">
+            Do not harvest
+          </p>
+          <p className="text-xs text-amber-400/80">
+            PHI active — safe to harvest from{" "}
+            <span data-testid="section-phi-safe-date">
+              {latestClear.toLocaleDateString()}
+            </span>{" "}
+            ({daysLeft} day{daysLeft !== 1 ? "s" : ""} remaining)
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      data-testid="section-phi-banner"
+      className="mb-6 flex items-center gap-3 rounded-xl border border-emerald-700/50 bg-emerald-900/20 px-4 py-3"
+    >
+      <span className="text-lg">✓</span>
+      <p className="text-sm font-semibold text-emerald-400">
+        Safe to harvest — all PHI intervals cleared
+      </p>
+    </div>
+  );
+}
 
 // Internal component so edit form state initialises synchronously from props —
 // avoids setState-in-effect and satisfies the fast-refresh rule (not exported).
@@ -70,12 +131,13 @@ function EditSectionForm({
         onChange={(e) => setName(e.target.value)}
         data-testid="section-detail-name-input"
       />
-      <Input
+      <Combobox
         label="Crop type"
         name="cropType"
         required
         value={cropType}
-        onChange={(e) => setCropType(e.target.value)}
+        onChange={setCropType}
+        suggestions={CROP_TYPES}
         data-testid="section-detail-croptype-input"
       />
       <Input
@@ -239,6 +301,8 @@ export function SectionDetail() {
               )}
             </Card>
 
+            <PhiStatusBanner sprays={sprays} />
+
             <section>
               <h2
                 data-testid="section-sprays-heading"
@@ -312,6 +376,13 @@ export function SectionDetail() {
                               >
                                 {spray.weatherNote}
                               </p>
+                            )}
+                            {spray.phiDays != null && (
+                              <PhiBadge
+                                sprayedAt={spray.sprayedAt}
+                                phiDays={spray.phiDays}
+                                testid={`section-spray-phi-${spray.id}`}
+                              />
                             )}
                           </div>
                           <Button

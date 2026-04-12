@@ -1,10 +1,14 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { NavBar } from "../components/NavBar";
 import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { PhiBadge } from "../components/PhiBadge";
+import { Combobox } from "../components/Combobox";
 import { listSections } from "../api/sections";
+import { listProducts } from "../api/products";
 import { listSprays, createSpray, deleteSpray } from "../api/sprays";
 import { HttpError } from "../api/client";
 
@@ -26,6 +30,11 @@ export function Sprays() {
     queryFn: listSections,
   });
 
+  const productsQuery = useQuery({
+    queryKey: ["products"],
+    queryFn: listProducts,
+  });
+
   const spraysQuery = useQuery({
     queryKey: ["sprays", filters],
     queryFn: () => listSprays(filters),
@@ -40,6 +49,7 @@ export function Sprays() {
   );
   const [weatherNote, setWeatherNote] = useState("");
   const [notes, setNotes] = useState("");
+  const [phiDays, setPhiDays] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -54,6 +64,7 @@ export function Sprays() {
       setSprayedAt(new Date().toISOString().slice(0, 10));
       setWeatherNote("");
       setNotes("");
+      setPhiDays("");
       setFormError(null);
     },
     onError: (err) => {
@@ -91,6 +102,7 @@ export function Sprays() {
       sprayedAt: new Date(sprayedAt).toISOString(),
       weatherNote: weatherNote.trim() || undefined,
       notes: notes.trim() || undefined,
+      phiDays: phiDays ? parseInt(phiDays, 10) : undefined,
     });
   };
 
@@ -101,16 +113,25 @@ export function Sprays() {
     <div data-testid="sprays-page" className="min-h-screen bg-slate-950">
       <NavBar />
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <div className="mb-8">
-          <h1
-            data-testid="sprays-heading"
-            className="text-2xl font-bold text-slate-50"
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <h1
+              data-testid="sprays-heading"
+              className="text-2xl font-bold text-slate-50"
+            >
+              Spray Records
+            </h1>
+            <p className="mt-1 text-sm text-slate-400">
+              Log and review all spray applications.
+            </p>
+          </div>
+          <Link
+            to="/sprays/batch"
+            data-testid="sprays-batch-link"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 h-10 text-sm font-medium text-white shadow-sm hover:bg-emerald-500 transition-colors"
           >
-            Spray Records
-          </h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Log and review all spray applications.
-          </p>
+            Batch spray
+          </Link>
         </div>
 
         <Card data-testid="sprays-create-card" className="mb-8">
@@ -148,12 +169,15 @@ export function Sprays() {
               </select>
             </div>
 
-            <Input
+            <Combobox
               label="Product name"
               name="productName"
               required
               value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              onChange={setProductName}
+              suggestions={(productsQuery.data ?? [])
+                .filter((p) => p.category === category)
+                .map((p) => p.name)}
               data-testid="sprays-product-input"
             />
 
@@ -169,7 +193,7 @@ export function Sprays() {
                 name="category"
                 required
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => { setCategory(e.target.value); setProductName(""); }}
                 data-testid="sprays-category-select"
                 className={selectClass}
               >
@@ -209,6 +233,18 @@ export function Sprays() {
               value={weatherNote}
               onChange={(e) => setWeatherNote(e.target.value)}
               data-testid="sprays-weather-input"
+            />
+
+            <Input
+              label="PHI (days, optional)"
+              name="phiDays"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="e.g. 14"
+              value={phiDays}
+              onChange={(e) => setPhiDays(e.target.value)}
+              data-testid="sprays-phi-input"
             />
 
             <div className="sm:col-span-2">
@@ -325,6 +361,13 @@ export function Sprays() {
                         >
                           {spray.weatherNote}
                         </p>
+                      )}
+                      {spray.phiDays != null && (
+                        <PhiBadge
+                          sprayedAt={spray.sprayedAt}
+                          phiDays={spray.phiDays}
+                          testid={`spray-phi-${spray.id}`}
+                        />
                       )}
                     </div>
                     <Button

@@ -29,6 +29,7 @@ export interface SprayRecord {
   sprayedAt: string;
   weatherNote: string | null;
   notes: string | null;
+  phiDays: number | null;
   sectionId: string;
   userId: string;
   createdAt: string;

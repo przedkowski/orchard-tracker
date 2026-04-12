@@ -5,6 +5,7 @@ import {
   getSpray,
   createSpray,
   deleteSpray,
+  batchCreateSprays,
 } from "../services/sprays.service.js";
 import { NotFoundError } from "../services/sections.service.js";
 
@@ -16,6 +17,7 @@ const createBody = z.object({
   sprayedAt: z.coerce.date(),
   weatherNote: z.string().max(500).optional(),
   notes: z.string().max(1000).optional(),
+  phiDays: z.number().int().positive().optional(),
 });
 
 const listQuery = z.object({
@@ -60,6 +62,34 @@ export async function spraysRoutes(app: FastifyInstance) {
     try {
       const spray = await createSpray(request.userId, parsed.data);
       return reply.code(201).send(spray);
+    } catch (err) {
+      if (err instanceof NotFoundError)
+        return reply.code(404).send({ error: err.message });
+      throw err;
+    }
+  });
+
+  const batchCreateBody = z.object({
+    sectionIds: z.array(z.string().min(1)).min(1).max(50),
+    productName: z.string().min(1).max(100),
+    category: z.string().min(1).max(50),
+    doseLPerHa: z.number().positive(),
+    sprayedAt: z.coerce.date(),
+    weatherNote: z.string().max(500).optional(),
+    notes: z.string().max(1000).optional(),
+    phiDays: z.number().int().positive().optional(),
+  });
+
+  app.post("/sprays/batch", async (request, reply) => {
+    const parsed = batchCreateBody.safeParse(request.body);
+    if (!parsed.success) {
+      return reply
+        .code(400)
+        .send({ error: "Invalid input", details: parsed.error.flatten() });
+    }
+    try {
+      const result = await batchCreateSprays(request.userId, parsed.data);
+      return reply.code(201).send(result);
     } catch (err) {
       if (err instanceof NotFoundError)
         return reply.code(404).send({ error: err.message });

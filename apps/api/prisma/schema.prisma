@@ -17,6 +17,7 @@ model User {
 
   sections OrchardSection[]
   sprays   SprayRecord[]
+  products UserProduct[]
 }
 
 model OrchardSection {
@@ -44,6 +45,7 @@ model SprayRecord {
   sprayedAt   DateTime
   weatherNote String?
   notes       String?
+  phiDays     Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -55,4 +57,17 @@ model SprayRecord {
   @@index([userId])
   @@index([sectionId])
   @@index([sprayedAt])
+}
+
+model UserProduct {
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
 }

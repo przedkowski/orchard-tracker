@@ -5,8 +5,10 @@ import { NavBar } from "../components/NavBar";
 import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { Combobox } from "../components/Combobox";
 import { listSections, createSection, deleteSection } from "../api/sections";
 import { HttpError } from "../api/client";
+import { CROP_TYPES } from "../constants/cropTypes";
 
 export function Sections() {
   const queryClient = useQueryClient();
@@ -104,12 +106,13 @@ export function Sections() {
               onChange={(e) => setName(e.target.value)}
               data-testid="sections-name-input"
             />
-            <Input
+            <Combobox
               label="Crop type"
               name="cropType"
               required
               value={cropType}
-              onChange={(e) => setCropType(e.target.value)}
+              onChange={setCropType}
+              suggestions={CROP_TYPES}
               data-testid="sections-croptype-input"
             />
             <Input

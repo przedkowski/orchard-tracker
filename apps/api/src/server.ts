@@ -8,6 +8,7 @@ import { authRoutes } from "./routes/auth.routes.js";
 import { sectionsRoutes } from "./routes/sections.routes.js";
 import { spraysRoutes } from "./routes/sprays.routes.js";
 import { suggestionsRoutes } from "./routes/suggestions.routes.js";
+import { productsRoutes } from "./routes/products.routes.js";
 
 export async function buildApp() {
   const app = Fastify({
@@ -32,6 +33,7 @@ export async function buildApp() {
   await app.register(sectionsRoutes, { prefix: "/api" });
   await app.register(spraysRoutes, { prefix: "/api" });
   await app.register(suggestionsRoutes, { prefix: "/api" });
+  await app.register(productsRoutes, { prefix: "/api" });
 
   return app;
 }
