@@ -59,7 +59,7 @@ function EditSectionForm({
     <form
       onSubmit={handleSubmit}
       data-testid="section-detail-edit-form"
-      className="flex flex-col gap-3"
+      className="grid grid-cols-1 gap-4 sm:grid-cols-2"
       noValidate
     >
       <Input
@@ -100,20 +100,20 @@ function EditSectionForm({
       {formError && (
         <p
           data-testid="section-detail-form-error"
-          className="text-sm text-red-600"
+          className="col-span-full rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
           role="alert"
         >
           {formError}
         </p>
       )}
 
-      <div className="flex gap-2">
+      <div className="col-span-full flex gap-2">
         <Button
           type="submit"
           disabled={updateMutation.isPending}
           data-testid="section-detail-save-submit"
         >
-          {updateMutation.isPending ? "Saving…" : "Save"}
+          {updateMutation.isPending ? "Saving…" : "Save changes"}
         </Button>
         <Button
           variant="secondary"
@@ -167,11 +167,11 @@ export function SectionDetail() {
   return (
     <div data-testid="section-detail-page" className="min-h-screen bg-slate-50">
       <NavBar />
-      <main className="mx-auto max-w-3xl p-4">
+      <main className="mx-auto max-w-3xl px-4 py-8">
         <Link
           to="/sections"
           data-testid="section-detail-back"
-          className="mb-4 inline-block text-sm text-emerald-700 hover:underline"
+          className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
         >
           ← Back to sections
         </Link>
@@ -179,7 +179,7 @@ export function SectionDetail() {
         {sectionQuery.isLoading && (
           <p
             data-testid="section-detail-loading"
-            className="text-sm text-slate-500"
+            className="text-sm text-slate-400"
           >
             Loading…
           </p>
@@ -197,41 +197,39 @@ export function SectionDetail() {
 
         {sectionQuery.isSuccess && section && (
           <>
-            <Card data-testid="section-detail-card" className="mb-6">
+            <Card data-testid="section-detail-card" className="mb-8">
               {!editing ? (
-                <div>
-                  <div className="mb-3 flex items-start justify-between gap-4">
-                    <div>
-                      <h1
-                        data-testid="section-detail-name"
-                        className="text-2xl font-semibold text-slate-900"
-                      >
-                        {section.name}
-                      </h1>
-                      <p
-                        data-testid="section-detail-meta"
-                        className="text-sm text-slate-600"
-                      >
-                        {section.cropType} · {section.areaHa} ha
-                      </p>
-                      {section.notes && (
-                        <p
-                          data-testid="section-detail-notes"
-                          className="mt-1 text-xs text-slate-500"
-                        >
-                          {section.notes}
-                        </p>
-                      )}
-                    </div>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setEditing(true)}
-                      data-testid="section-detail-edit-button"
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h1
+                      data-testid="section-detail-name"
+                      className="text-2xl font-bold text-slate-900"
                     >
-                      Edit
-                    </Button>
+                      {section.name}
+                    </h1>
+                    <p
+                      data-testid="section-detail-meta"
+                      className="mt-1 text-sm text-slate-500"
+                    >
+                      {section.cropType} · {section.areaHa} ha
+                    </p>
+                    {section.notes && (
+                      <p
+                        data-testid="section-detail-notes"
+                        className="mt-2 text-sm text-slate-400"
+                      >
+                        {section.notes}
+                      </p>
+                    )}
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setEditing(true)}
+                    data-testid="section-detail-edit-button"
+                  >
+                    Edit
+                  </Button>
                 </div>
               ) : (
                 <EditSectionForm
@@ -244,7 +242,7 @@ export function SectionDetail() {
             <section>
               <h2
                 data-testid="section-sprays-heading"
-                className="mb-3 text-lg font-semibold text-slate-900"
+                className="mb-4 text-base font-semibold text-slate-900"
               >
                 Sprays
               </h2>
@@ -252,7 +250,7 @@ export function SectionDetail() {
               {deleteError && (
                 <p
                   data-testid="section-sprays-delete-error"
-                  className="mb-3 text-sm text-red-600"
+                  className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
                   role="alert"
                 >
                   {deleteError}
@@ -262,7 +260,7 @@ export function SectionDetail() {
               {spraysQuery.isLoading && (
                 <p
                   data-testid="section-sprays-loading"
-                  className="text-sm text-slate-500"
+                  className="text-sm text-slate-400"
                 >
                   Loading…
                 </p>
@@ -281,7 +279,7 @@ export function SectionDetail() {
               {spraysQuery.isSuccess && sprays.length === 0 && (
                 <p
                   data-testid="section-sprays-empty"
-                  className="text-sm text-slate-500"
+                  className="text-sm text-slate-400"
                 >
                   No sprays logged for this section.
                 </p>
@@ -294,35 +292,37 @@ export function SectionDetail() {
                 >
                   {sprays.map((spray) => (
                     <li key={spray.id}>
-                      <Card data-testid={`section-spray-card-${spray.id}`}>
+                      <Card
+                        data-testid={`section-spray-card-${spray.id}`}
+                        className="transition-shadow hover:shadow-md"
+                      >
                         <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <p className="font-medium text-slate-900">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-900">
                               {spray.productName}
                             </p>
-                            <p className="text-sm text-slate-600">
-                              {spray.category} · {spray.doseLPerHa} L/ha
-                            </p>
-                            <p className="text-xs text-slate-500">
+                            <p className="mt-0.5 text-xs text-slate-500">
+                              {spray.category} · {spray.doseLPerHa} L/ha ·{" "}
                               {new Date(spray.sprayedAt).toLocaleDateString()}
                             </p>
                             {spray.weatherNote && (
                               <p
                                 data-testid={`section-spray-weather-${spray.id}`}
-                                className="text-xs text-slate-500"
+                                className="mt-1 text-xs text-slate-400"
                               >
                                 {spray.weatherNote}
                               </p>
                             )}
                           </div>
                           <Button
-                            variant="danger"
+                            variant="secondary"
                             size="sm"
                             data-testid={`section-spray-delete-${spray.id}`}
                             onClick={() =>
                               deleteSprayMutation.mutate(spray.id)
                             }
                             disabled={deleteSprayMutation.isPending}
+                            className="text-red-600 hover:border-red-300 hover:bg-red-50"
                           >
                             Delete
                           </Button>

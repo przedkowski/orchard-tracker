@@ -15,16 +15,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const errorTestid = testid ? `${testid}-error` : undefined;
 
   const base =
-    "block w-full rounded-md border px-3 h-10 text-sm " +
-    "focus:outline-none focus:ring-2 focus:ring-offset-0";
+    "block w-full rounded-lg border px-3 h-10 text-sm bg-white " +
+    "transition-colors duration-150 " +
+    "focus:outline-none focus:ring-2 focus:ring-offset-0 placeholder:text-slate-400";
   const state = error
-    ? "border-red-400 focus:ring-red-400"
-    : "border-slate-300 focus:ring-emerald-500";
+    ? "border-red-400 focus:ring-red-400 focus:border-red-400"
+    : "border-slate-300 focus:ring-emerald-500 focus:border-emerald-500";
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       {label && (
-        <label htmlFor={inputId} className="text-sm font-medium text-slate-700">
+        <label
+          htmlFor={inputId}
+          className="text-sm font-medium text-slate-700"
+        >
           {label}
         </label>
       )}

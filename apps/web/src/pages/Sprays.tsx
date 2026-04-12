@@ -11,15 +11,14 @@ import { HttpError } from "../api/client";
 const CATEGORIES = ["Fungicide", "Insecticide", "Herbicide", "Fertilizer", "Other"];
 
 const selectClass =
-  "block w-full rounded-md border border-slate-300 px-3 h-10 text-sm " +
-  "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-emerald-500 bg-white";
+  "block w-full rounded-lg border border-slate-300 bg-white px-3 h-10 text-sm " +
+  "transition-colors duration-150 " +
+  "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-emerald-500 focus:border-emerald-500";
 
 export function Sprays() {
   const queryClient = useQueryClient();
 
-  // Filter
   const [filterSectionId, setFilterSectionId] = useState("");
-
   const filters = filterSectionId ? { sectionId: filterSectionId } : undefined;
 
   const sectionsQuery = useQuery({
@@ -32,7 +31,6 @@ export function Sprays() {
     queryFn: () => listSprays(filters),
   });
 
-  // Create form
   const [sectionId, setSectionId] = useState("");
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
@@ -102,26 +100,30 @@ export function Sprays() {
   return (
     <div data-testid="sprays-page" className="min-h-screen bg-slate-50">
       <NavBar />
-      <main className="mx-auto max-w-3xl p-4">
-        <h1
-          data-testid="sprays-heading"
-          className="mb-6 text-2xl font-semibold text-slate-900"
-        >
-          Spray Records
-        </h1>
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <div className="mb-8">
+          <h1
+            data-testid="sprays-heading"
+            className="text-2xl font-bold text-slate-900"
+          >
+            Spray Records
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Log and review all spray applications.
+          </p>
+        </div>
 
-        {/* Create form */}
-        <Card data-testid="sprays-create-card" className="mb-6">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">
-            Log spray
+        <Card data-testid="sprays-create-card" className="mb-8">
+          <h2 className="mb-5 text-base font-semibold text-slate-900">
+            Log new spray
           </h2>
           <form
             onSubmit={handleCreate}
             data-testid="sprays-create-form"
-            className="flex flex-col gap-3"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
             noValidate
           >
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="spray-section"
                 className="text-sm font-medium text-slate-700"
@@ -155,7 +157,7 @@ export function Sprays() {
               data-testid="sprays-product-input"
             />
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="spray-category"
                 className="text-sm font-medium text-slate-700"
@@ -209,36 +211,39 @@ export function Sprays() {
               data-testid="sprays-weather-input"
             />
 
-            <Input
-              label="Notes (optional)"
-              name="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              data-testid="sprays-notes-input"
-            />
+            <div className="sm:col-span-2">
+              <Input
+                label="Notes (optional)"
+                name="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                data-testid="sprays-notes-input"
+              />
+            </div>
 
             {formError && (
               <p
                 data-testid="sprays-form-error"
-                className="text-sm text-red-600"
+                className="col-span-full rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
                 role="alert"
               >
                 {formError}
               </p>
             )}
 
-            <Button
-              type="submit"
-              disabled={createMutation.isPending}
-              data-testid="sprays-create-submit"
-            >
-              {createMutation.isPending ? "Logging…" : "Log spray"}
-            </Button>
+            <div className="col-span-full">
+              <Button
+                type="submit"
+                disabled={createMutation.isPending}
+                data-testid="sprays-create-submit"
+              >
+                {createMutation.isPending ? "Logging…" : "Log spray"}
+              </Button>
+            </div>
           </form>
         </Card>
 
-        {/* Filter */}
-        <div className="mb-4 flex flex-col gap-1">
+        <div className="mb-5 flex flex-col gap-1.5">
           <label
             htmlFor="filter-section"
             className="text-sm font-medium text-slate-700"
@@ -264,7 +269,7 @@ export function Sprays() {
         {deleteError && (
           <p
             data-testid="sprays-delete-error"
-            className="mb-4 text-sm text-red-600"
+            className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
             role="alert"
           >
             {deleteError}
@@ -272,7 +277,7 @@ export function Sprays() {
         )}
 
         {spraysQuery.isLoading && (
-          <p data-testid="sprays-loading" className="text-sm text-slate-500">
+          <p data-testid="sprays-loading" className="text-sm text-slate-400">
             Loading…
           </p>
         )}
@@ -288,7 +293,7 @@ export function Sprays() {
         )}
 
         {spraysQuery.isSuccess && sprays.length === 0 && (
-          <p data-testid="sprays-empty" className="text-sm text-slate-500">
+          <p data-testid="sprays-empty" className="text-sm text-slate-400">
             No sprays logged yet.
           </p>
         )}
@@ -297,41 +302,38 @@ export function Sprays() {
           <ul data-testid="sprays-list" className="flex flex-col gap-3">
             {sprays.map((spray) => (
               <li key={spray.id}>
-                <Card data-testid={`spray-card-${spray.id}`}>
+                <Card
+                  data-testid={`spray-card-${spray.id}`}
+                  className="transition-shadow hover:shadow-md"
+                >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="font-medium text-slate-900">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900">
                         {spray.productName}
                       </p>
-                      <p className="text-sm text-slate-600">
+                      <p className="mt-0.5 text-xs text-slate-500">
                         {spray.category} · {spray.doseLPerHa} L/ha
+                        {spray.section ? ` · ${spray.section.name}` : ""}
                       </p>
-                      {spray.section && (
-                        <p
-                          data-testid={`spray-section-${spray.id}`}
-                          className="text-xs text-slate-500"
-                        >
-                          {spray.section.name}
-                        </p>
-                      )}
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-400">
                         {new Date(spray.sprayedAt).toLocaleDateString()}
                       </p>
                       {spray.weatherNote && (
                         <p
                           data-testid={`spray-weather-${spray.id}`}
-                          className="text-xs text-slate-500"
+                          className="mt-1 text-xs text-slate-400"
                         >
                           {spray.weatherNote}
                         </p>
                       )}
                     </div>
                     <Button
-                      variant="danger"
+                      variant="secondary"
                       size="sm"
                       data-testid={`spray-delete-${spray.id}`}
                       onClick={() => deleteMutation.mutate(spray.id)}
                       disabled={deleteMutation.isPending}
+                      className="text-red-600 hover:border-red-300 hover:bg-red-50"
                     >
                       Delete
                     </Button>

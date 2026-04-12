@@ -2,9 +2,11 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Button } from "./Button";
 
-const linkBase = "px-3 py-2 rounded-md text-sm font-medium transition-colors";
-const linkInactive = "text-slate-600 hover:bg-slate-100 hover:text-slate-900";
-const linkActive = "bg-emerald-50 text-emerald-700";
+const linkBase =
+  "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150";
+const linkInactive =
+  "text-slate-500 hover:text-slate-900 hover:bg-slate-100";
+const linkActive = "bg-emerald-50 text-emerald-700 font-semibold";
 
 export function NavBar() {
   const { user, status, signOut } = useAuth();
@@ -16,18 +18,22 @@ export function NavBar() {
   };
 
   return (
-    <nav data-testid="navbar" className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+    <nav
+      data-testid="navbar"
+      className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-sm"
+    >
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
         <Link
           to="/"
           data-testid="navbar-brand"
-          className="text-lg font-semibold text-emerald-700"
+          className="flex items-center gap-2 text-base font-bold text-emerald-700 tracking-tight"
         >
-          🌳 Orchard Tracker
+          <span className="text-xl">🌳</span>
+          Orchard Tracker
         </Link>
 
         {status === "authenticated" && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <NavLink
               to="/dashboard"
               data-testid="navbar-dashboard-link"
@@ -55,20 +61,23 @@ export function NavBar() {
             >
               Sprays
             </NavLink>
-            <span
-              data-testid="navbar-user-name"
-              className="ml-2 text-sm text-slate-600"
-            >
-              {user?.name}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSignOut}
-              data-testid="navbar-signout"
-            >
-              Sign out
-            </Button>
+
+            <div className="ml-3 flex items-center gap-2 border-l border-slate-200 pl-3">
+              <span
+                data-testid="navbar-user-name"
+                className="hidden text-sm text-slate-500 sm:block"
+              >
+                {user?.name}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                data-testid="navbar-signout"
+              >
+                Sign out
+              </Button>
+            </div>
           </div>
         )}
 

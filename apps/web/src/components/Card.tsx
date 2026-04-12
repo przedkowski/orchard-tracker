@@ -6,7 +6,8 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function Card({ children, className = "", ...rest }: CardProps) {
-  const base = "rounded-lg border border-slate-200 bg-white p-4 shadow-sm";
+  const base =
+    "rounded-xl border border-slate-200 bg-white p-5 shadow-sm";
   return (
     <div className={`${base} ${className}`.trim()} {...rest}>
       {children}

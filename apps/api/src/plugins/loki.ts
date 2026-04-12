@@ -9,7 +9,6 @@ const lokiPlugin: FastifyPluginAsync = async (app) => {
     app.log.warn("Loki plugin: missing credentials, skipping");
     return;
   }
-  app.log.info({ pushUrl: `${env.LOKI_URL}/loki/api/v1/push` }, "Loki plugin active");
 
   const auth = Buffer.from(`${env.LOKI_USER}:${env.LOKI_PASSWORD}`).toString(
     "base64",
@@ -50,13 +49,11 @@ const lokiPlugin: FastifyPluginAsync = async (app) => {
         },
         body: JSON.stringify(entry),
       });
-      app.log.info({ status: res.status }, "Loki push response");
       if (!res.ok) {
-        const body = await res.text();
-        app.log.error({ status: res.status, body }, "Loki push failed");
+        app.log.warn({ status: res.status }, "Loki push failed");
       }
     } catch (err) {
-      app.log.error({ err }, "Loki fetch error");
+      app.log.warn({ err }, "Loki fetch error");
     }
   });
 };

@@ -73,22 +73,29 @@ export function Sections() {
   return (
     <div data-testid="sections-page" className="min-h-screen bg-slate-50">
       <NavBar />
-      <main className="mx-auto max-w-3xl p-4">
-        <h1
-          data-testid="sections-heading"
-          className="mb-6 text-2xl font-semibold text-slate-900"
-        >
-          Orchard Sections
-        </h1>
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1
+              data-testid="sections-heading"
+              className="text-2xl font-bold text-slate-900"
+            >
+              Orchard Sections
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Manage your orchard areas and crop types.
+            </p>
+          </div>
+        </div>
 
-        <Card data-testid="sections-create-card" className="mb-6">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">
-            Add section
+        <Card data-testid="sections-create-card" className="mb-8">
+          <h2 className="mb-5 text-base font-semibold text-slate-900">
+            Add new section
           </h2>
           <form
             onSubmit={handleCreate}
             data-testid="sections-create-form"
-            className="flex flex-col gap-3"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
             noValidate
           >
             <Input
@@ -129,27 +136,29 @@ export function Sections() {
             {formError && (
               <p
                 data-testid="sections-form-error"
-                className="text-sm text-red-600"
+                className="col-span-full rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
                 role="alert"
               >
                 {formError}
               </p>
             )}
 
-            <Button
-              type="submit"
-              disabled={createMutation.isPending}
-              data-testid="sections-create-submit"
-            >
-              {createMutation.isPending ? "Adding…" : "Add section"}
-            </Button>
+            <div className="col-span-full">
+              <Button
+                type="submit"
+                disabled={createMutation.isPending}
+                data-testid="sections-create-submit"
+              >
+                {createMutation.isPending ? "Adding…" : "Add section"}
+              </Button>
+            </div>
           </form>
         </Card>
 
         {deleteError && (
           <p
             data-testid="sections-delete-error"
-            className="mb-4 text-sm text-red-600"
+            className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
             role="alert"
           >
             {deleteError}
@@ -157,7 +166,7 @@ export function Sections() {
         )}
 
         {sectionsQuery.isLoading && (
-          <p data-testid="sections-loading" className="text-sm text-slate-500">
+          <p data-testid="sections-loading" className="text-sm text-slate-400">
             Loading…
           </p>
         )}
@@ -173,7 +182,7 @@ export function Sections() {
         )}
 
         {sectionsQuery.isSuccess && sections.length === 0 && (
-          <p data-testid="sections-empty" className="text-sm text-slate-500">
+          <p data-testid="sections-empty" className="text-sm text-slate-400">
             No sections yet. Add one above.
           </p>
         )}
@@ -182,34 +191,38 @@ export function Sections() {
           <ul data-testid="sections-list" className="flex flex-col gap-3">
             {sections.map((section) => (
               <li key={section.id}>
-                <Card data-testid={`section-card-${section.id}`}>
+                <Card
+                  data-testid={`section-card-${section.id}`}
+                  className="transition-shadow hover:shadow-md"
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
                       <Link
                         to={`/sections/${section.id}`}
                         data-testid={`section-link-${section.id}`}
-                        className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                        className="text-sm font-semibold text-slate-900 hover:text-emerald-700 hover:underline"
                       >
                         {section.name}
                       </Link>
-                      <p className="text-sm text-slate-600">
+                      <p className="mt-0.5 text-xs text-slate-500">
                         {section.cropType} · {section.areaHa} ha
                       </p>
                       {section.notes && (
                         <p
                           data-testid={`section-notes-${section.id}`}
-                          className="mt-1 text-xs text-slate-500"
+                          className="mt-1 text-xs text-slate-400"
                         >
                           {section.notes}
                         </p>
                       )}
                     </div>
                     <Button
-                      variant="danger"
+                      variant="secondary"
                       size="sm"
                       data-testid={`section-delete-${section.id}`}
                       onClick={() => deleteMutation.mutate(section.id)}
                       disabled={deleteMutation.isPending}
+                      className="text-red-600 hover:border-red-300 hover:bg-red-50"
                     >
                       Delete
                     </Button>
