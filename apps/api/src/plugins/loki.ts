@@ -15,7 +15,7 @@ const lokiPlugin: FastifyPluginAsync = async (app) => {
   );
   const pushUrl = `${env.LOKI_URL}/loki/api/v1/push`;
 
-  app.addHook("onResponse", (request, reply, done) => {
+  app.addHook("onResponse", async (request, reply) => {
     const entry = {
       streams: [
         {
@@ -40,25 +40,23 @@ const lokiPlugin: FastifyPluginAsync = async (app) => {
       ],
     };
 
-    fetch(pushUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${auth}`,
-      },
-      body: JSON.stringify(entry),
-    }).then((res) => {
+    try {
+      const res = await fetch(pushUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${auth}`,
+        },
+        body: JSON.stringify(entry),
+      });
       app.log.info({ status: res.status }, "Loki push response");
       if (!res.ok) {
-        res.text().then((body) => {
-          app.log.error({ status: res.status, body }, "Loki push failed");
-        });
+        const body = await res.text();
+        app.log.error({ status: res.status, body }, "Loki push failed");
       }
-    }).catch((err) => {
+    } catch (err) {
       app.log.error({ err }, "Loki fetch error");
-    });
-
-    done();
+    }
   });
 };
 
