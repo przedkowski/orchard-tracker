@@ -7,14 +7,13 @@ COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY packages/ packages/
 
-RUN npm ci --ignore-scripts
-RUN cd apps/api && npx prisma generate
+RUN npm ci
 
 COPY apps/api/src apps/api/src
 COPY apps/api/tsconfig.json apps/api/tsconfig.json
 COPY apps/api/prisma apps/api/prisma
 
-RUN npm run build -w apps/api
+RUN cd apps/api && npx prisma generate && npm run build
 
 # ---- runtime ----
 FROM node:22-alpine AS runner
