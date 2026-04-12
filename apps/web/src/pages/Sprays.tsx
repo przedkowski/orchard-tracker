@@ -11,7 +11,7 @@ import { HttpError } from "../api/client";
 const CATEGORIES = ["Fungicide", "Insecticide", "Herbicide", "Fertilizer", "Other"];
 
 const selectClass =
-  "block w-full rounded-lg border border-slate-300 bg-white px-3 h-10 text-sm " +
+  "block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 h-10 text-sm text-slate-100 " +
   "transition-colors duration-150 " +
   "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-emerald-500 focus:border-emerald-500";
 
@@ -98,23 +98,23 @@ export function Sprays() {
   const sprays = spraysQuery.data ?? [];
 
   return (
-    <div data-testid="sprays-page" className="min-h-screen bg-slate-50">
+    <div data-testid="sprays-page" className="min-h-screen bg-slate-950">
       <NavBar />
       <main className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8">
           <h1
             data-testid="sprays-heading"
-            className="text-2xl font-bold text-slate-900"
+            className="text-2xl font-bold text-slate-50"
           >
             Spray Records
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-400">
             Log and review all spray applications.
           </p>
         </div>
 
         <Card data-testid="sprays-create-card" className="mb-8">
-          <h2 className="mb-5 text-base font-semibold text-slate-900">
+          <h2 className="mb-5 text-base font-semibold text-slate-200">
             Log new spray
           </h2>
           <form
@@ -126,7 +126,7 @@ export function Sprays() {
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="spray-section"
-                className="text-sm font-medium text-slate-700"
+                className="text-sm font-medium text-slate-300"
               >
                 Section
               </label>
@@ -160,7 +160,7 @@ export function Sprays() {
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="spray-category"
-                className="text-sm font-medium text-slate-700"
+                className="text-sm font-medium text-slate-300"
               >
                 Category
               </label>
@@ -224,7 +224,7 @@ export function Sprays() {
             {formError && (
               <p
                 data-testid="sprays-form-error"
-                className="col-span-full rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+                className="col-span-full rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
                 role="alert"
               >
                 {formError}
@@ -246,7 +246,7 @@ export function Sprays() {
         <div className="mb-5 flex flex-col gap-1.5">
           <label
             htmlFor="filter-section"
-            className="text-sm font-medium text-slate-700"
+            className="text-sm font-medium text-slate-300"
           >
             Filter by section
           </label>
@@ -269,7 +269,7 @@ export function Sprays() {
         {deleteError && (
           <p
             data-testid="sprays-delete-error"
-            className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+            className="mb-4 rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
             role="alert"
           >
             {deleteError}
@@ -277,7 +277,7 @@ export function Sprays() {
         )}
 
         {spraysQuery.isLoading && (
-          <p data-testid="sprays-loading" className="text-sm text-slate-400">
+          <p data-testid="sprays-loading" className="text-sm text-slate-500">
             Loading…
           </p>
         )}
@@ -285,7 +285,7 @@ export function Sprays() {
         {spraysQuery.isError && (
           <p
             data-testid="sprays-error"
-            className="text-sm text-red-600"
+            className="text-sm text-red-400"
             role="alert"
           >
             Failed to load sprays.
@@ -293,7 +293,7 @@ export function Sprays() {
         )}
 
         {spraysQuery.isSuccess && sprays.length === 0 && (
-          <p data-testid="sprays-empty" className="text-sm text-slate-400">
+          <p data-testid="sprays-empty" className="text-sm text-slate-500">
             No sprays logged yet.
           </p>
         )}
@@ -304,24 +304,24 @@ export function Sprays() {
               <li key={spray.id}>
                 <Card
                   data-testid={`spray-card-${spray.id}`}
-                  className="transition-shadow hover:shadow-md"
+                  className="transition-shadow hover:shadow-md hover:shadow-slate-950/60"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="text-sm font-semibold text-slate-100">
                         {spray.productName}
                       </p>
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="mt-0.5 text-xs text-slate-400">
                         {spray.category} · {spray.doseLPerHa} L/ha
                         {spray.section ? ` · ${spray.section.name}` : ""}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-500">
                         {new Date(spray.sprayedAt).toLocaleDateString()}
                       </p>
                       {spray.weatherNote && (
                         <p
                           data-testid={`spray-weather-${spray.id}`}
-                          className="mt-1 text-xs text-slate-400"
+                          className="mt-1 text-xs text-slate-500"
                         >
                           {spray.weatherNote}
                         </p>
@@ -333,7 +333,7 @@ export function Sprays() {
                       data-testid={`spray-delete-${spray.id}`}
                       onClick={() => deleteMutation.mutate(spray.id)}
                       disabled={deleteMutation.isPending}
-                      className="text-red-600 hover:border-red-300 hover:bg-red-50"
+                      className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
                     >
                       Delete
                     </Button>

@@ -35,24 +35,24 @@ export function SignIn() {
   return (
     <div
       data-testid="signin-page"
-      className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-slate-100 p-4"
+      className="flex min-h-screen items-center justify-center bg-slate-950 p-4"
     >
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <span className="text-4xl">🌳</span>
-          <h1 className="mt-2 text-2xl font-bold text-slate-900">
+          <h1 className="mt-2 text-2xl font-bold text-slate-50">
             Orchard Tracker
           </h1>
-          <p className="mt-1 text-sm text-slate-500">Sign in to your account</p>
+          <p className="mt-1 text-sm text-slate-400">Sign in to your account</p>
         </div>
 
         <div
           data-testid="signin-card"
-          className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/60"
+          className="rounded-2xl border border-slate-700 bg-slate-900 p-8 shadow-xl shadow-slate-950/60"
         >
           <h2
             data-testid="signin-heading"
-            className="mb-6 text-lg font-semibold text-slate-900"
+            className="mb-6 text-lg font-semibold text-slate-50"
           >
             Welcome back
           </h2>
@@ -87,7 +87,7 @@ export function SignIn() {
             {error && (
               <p
                 data-testid="signin-error"
-                className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+                className="rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
                 role="alert"
               >
                 {error}
@@ -110,7 +110,7 @@ export function SignIn() {
           <Link
             to="/signup"
             data-testid="signin-to-signup"
-            className="font-medium text-emerald-700 hover:underline"
+            className="font-medium text-emerald-400 hover:underline"
           >
             Create one
           </Link>

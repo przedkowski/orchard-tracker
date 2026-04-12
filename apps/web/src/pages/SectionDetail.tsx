@@ -100,7 +100,7 @@ function EditSectionForm({
       {formError && (
         <p
           data-testid="section-detail-form-error"
-          className="col-span-full rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+          className="col-span-full rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
           role="alert"
         >
           {formError}
@@ -165,13 +165,13 @@ export function SectionDetail() {
   const sprays = spraysQuery.data ?? [];
 
   return (
-    <div data-testid="section-detail-page" className="min-h-screen bg-slate-50">
+    <div data-testid="section-detail-page" className="min-h-screen bg-slate-950">
       <NavBar />
       <main className="mx-auto max-w-3xl px-4 py-8">
         <Link
           to="/sections"
           data-testid="section-detail-back"
-          className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+          className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-emerald-400 hover:underline"
         >
           ← Back to sections
         </Link>
@@ -179,7 +179,7 @@ export function SectionDetail() {
         {sectionQuery.isLoading && (
           <p
             data-testid="section-detail-loading"
-            className="text-sm text-slate-400"
+            className="text-sm text-slate-500"
           >
             Loading…
           </p>
@@ -188,7 +188,7 @@ export function SectionDetail() {
         {sectionQuery.isError && (
           <p
             data-testid="section-detail-error"
-            className="text-sm text-red-600"
+            className="text-sm text-red-400"
             role="alert"
           >
             Failed to load section.
@@ -203,20 +203,20 @@ export function SectionDetail() {
                   <div>
                     <h1
                       data-testid="section-detail-name"
-                      className="text-2xl font-bold text-slate-900"
+                      className="text-2xl font-bold text-slate-50"
                     >
                       {section.name}
                     </h1>
                     <p
                       data-testid="section-detail-meta"
-                      className="mt-1 text-sm text-slate-500"
+                      className="mt-1 text-sm text-slate-400"
                     >
                       {section.cropType} · {section.areaHa} ha
                     </p>
                     {section.notes && (
                       <p
                         data-testid="section-detail-notes"
-                        className="mt-2 text-sm text-slate-400"
+                        className="mt-2 text-sm text-slate-500"
                       >
                         {section.notes}
                       </p>
@@ -242,7 +242,7 @@ export function SectionDetail() {
             <section>
               <h2
                 data-testid="section-sprays-heading"
-                className="mb-4 text-base font-semibold text-slate-900"
+                className="mb-4 text-base font-semibold text-slate-200"
               >
                 Sprays
               </h2>
@@ -250,7 +250,7 @@ export function SectionDetail() {
               {deleteError && (
                 <p
                   data-testid="section-sprays-delete-error"
-                  className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+                  className="mb-3 rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
                   role="alert"
                 >
                   {deleteError}
@@ -260,7 +260,7 @@ export function SectionDetail() {
               {spraysQuery.isLoading && (
                 <p
                   data-testid="section-sprays-loading"
-                  className="text-sm text-slate-400"
+                  className="text-sm text-slate-500"
                 >
                   Loading…
                 </p>
@@ -269,7 +269,7 @@ export function SectionDetail() {
               {spraysQuery.isError && (
                 <p
                   data-testid="section-sprays-error"
-                  className="text-sm text-red-600"
+                  className="text-sm text-red-400"
                   role="alert"
                 >
                   Failed to load sprays.
@@ -279,7 +279,7 @@ export function SectionDetail() {
               {spraysQuery.isSuccess && sprays.length === 0 && (
                 <p
                   data-testid="section-sprays-empty"
-                  className="text-sm text-slate-400"
+                  className="text-sm text-slate-500"
                 >
                   No sprays logged for this section.
                 </p>
@@ -294,21 +294,21 @@ export function SectionDetail() {
                     <li key={spray.id}>
                       <Card
                         data-testid={`section-spray-card-${spray.id}`}
-                        className="transition-shadow hover:shadow-md"
+                        className="transition-shadow hover:shadow-md hover:shadow-slate-950/60"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-slate-900">
+                            <p className="text-sm font-semibold text-slate-100">
                               {spray.productName}
                             </p>
-                            <p className="mt-0.5 text-xs text-slate-500">
+                            <p className="mt-0.5 text-xs text-slate-400">
                               {spray.category} · {spray.doseLPerHa} L/ha ·{" "}
                               {new Date(spray.sprayedAt).toLocaleDateString()}
                             </p>
                             {spray.weatherNote && (
                               <p
                                 data-testid={`section-spray-weather-${spray.id}`}
-                                className="mt-1 text-xs text-slate-400"
+                                className="mt-1 text-xs text-slate-500"
                               >
                                 {spray.weatherNote}
                               </p>
@@ -322,7 +322,7 @@ export function SectionDetail() {
                               deleteSprayMutation.mutate(spray.id)
                             }
                             disabled={deleteSprayMutation.isPending}
-                            className="text-red-600 hover:border-red-300 hover:bg-red-50"
+                            className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
                           >
                             Delete
                           </Button>

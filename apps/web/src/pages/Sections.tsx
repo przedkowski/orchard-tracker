@@ -71,25 +71,23 @@ export function Sections() {
   const sections = sectionsQuery.data ?? [];
 
   return (
-    <div data-testid="sections-page" className="min-h-screen bg-slate-50">
+    <div data-testid="sections-page" className="min-h-screen bg-slate-950">
       <NavBar />
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1
-              data-testid="sections-heading"
-              className="text-2xl font-bold text-slate-900"
-            >
-              Orchard Sections
-            </h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Manage your orchard areas and crop types.
-            </p>
-          </div>
+        <div className="mb-8">
+          <h1
+            data-testid="sections-heading"
+            className="text-2xl font-bold text-slate-50"
+          >
+            Orchard Sections
+          </h1>
+          <p className="mt-1 text-sm text-slate-400">
+            Manage your orchard areas and crop types.
+          </p>
         </div>
 
         <Card data-testid="sections-create-card" className="mb-8">
-          <h2 className="mb-5 text-base font-semibold text-slate-900">
+          <h2 className="mb-5 text-base font-semibold text-slate-200">
             Add new section
           </h2>
           <form
@@ -136,7 +134,7 @@ export function Sections() {
             {formError && (
               <p
                 data-testid="sections-form-error"
-                className="col-span-full rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+                className="col-span-full rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
                 role="alert"
               >
                 {formError}
@@ -158,7 +156,7 @@ export function Sections() {
         {deleteError && (
           <p
             data-testid="sections-delete-error"
-            className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+            className="mb-4 rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
             role="alert"
           >
             {deleteError}
@@ -166,7 +164,7 @@ export function Sections() {
         )}
 
         {sectionsQuery.isLoading && (
-          <p data-testid="sections-loading" className="text-sm text-slate-400">
+          <p data-testid="sections-loading" className="text-sm text-slate-500">
             Loading…
           </p>
         )}
@@ -174,7 +172,7 @@ export function Sections() {
         {sectionsQuery.isError && (
           <p
             data-testid="sections-error"
-            className="text-sm text-red-600"
+            className="text-sm text-red-400"
             role="alert"
           >
             Failed to load sections.
@@ -182,7 +180,7 @@ export function Sections() {
         )}
 
         {sectionsQuery.isSuccess && sections.length === 0 && (
-          <p data-testid="sections-empty" className="text-sm text-slate-400">
+          <p data-testid="sections-empty" className="text-sm text-slate-500">
             No sections yet. Add one above.
           </p>
         )}
@@ -193,24 +191,24 @@ export function Sections() {
               <li key={section.id}>
                 <Card
                   data-testid={`section-card-${section.id}`}
-                  className="transition-shadow hover:shadow-md"
+                  className="transition-shadow hover:shadow-md hover:shadow-slate-950/60"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
                       <Link
                         to={`/sections/${section.id}`}
                         data-testid={`section-link-${section.id}`}
-                        className="text-sm font-semibold text-slate-900 hover:text-emerald-700 hover:underline"
+                        className="text-sm font-semibold text-slate-100 hover:text-emerald-400 hover:underline"
                       >
                         {section.name}
                       </Link>
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="mt-0.5 text-xs text-slate-400">
                         {section.cropType} · {section.areaHa} ha
                       </p>
                       {section.notes && (
                         <p
                           data-testid={`section-notes-${section.id}`}
-                          className="mt-1 text-xs text-slate-400"
+                          className="mt-1 text-xs text-slate-500"
                         >
                           {section.notes}
                         </p>
@@ -222,7 +220,7 @@ export function Sections() {
                       data-testid={`section-delete-${section.id}`}
                       onClick={() => deleteMutation.mutate(section.id)}
                       disabled={deleteMutation.isPending}
-                      className="text-red-600 hover:border-red-300 hover:bg-red-50"
+                      className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
                     >
                       Delete
                     </Button>
