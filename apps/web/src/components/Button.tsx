@@ -12,18 +12,18 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const base =
   "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150 " +
-  "focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 " +
+  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50 " +
   "active:scale-[0.98]";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 focus:ring-emerald-500",
+    "bg-emerald-600 text-white shadow-sm hover:bg-emerald-500 focus:ring-emerald-500",
   secondary:
-    "bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 focus:ring-slate-400",
+    "bg-slate-800 text-slate-200 border border-slate-600 shadow-sm hover:bg-slate-700 focus:ring-slate-500",
   danger:
-    "bg-red-500 text-white shadow-sm hover:bg-red-600 focus:ring-red-500",
+    "bg-red-600 text-white shadow-sm hover:bg-red-500 focus:ring-red-500",
   ghost:
-    "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-300",
+    "bg-transparent text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus:ring-slate-600",
 };
 
 const sizes: Record<Size, string> = {

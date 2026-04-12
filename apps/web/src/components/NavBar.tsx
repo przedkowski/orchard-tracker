@@ -5,8 +5,8 @@ import { Button } from "./Button";
 const linkBase =
   "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150";
 const linkInactive =
-  "text-slate-500 hover:text-slate-900 hover:bg-slate-100";
-const linkActive = "bg-emerald-50 text-emerald-700 font-semibold";
+  "text-slate-400 hover:text-slate-100 hover:bg-slate-800";
+const linkActive = "bg-emerald-900/50 text-emerald-400 font-semibold";
 
 export function NavBar() {
   const { user, status, signOut } = useAuth();
@@ -20,13 +20,13 @@ export function NavBar() {
   return (
     <nav
       data-testid="navbar"
-      className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-sm"
+      className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/90 backdrop-blur-sm"
     >
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
         <Link
           to="/"
           data-testid="navbar-brand"
-          className="flex items-center gap-2 text-base font-bold text-emerald-700 tracking-tight"
+          className="flex items-center gap-2 text-base font-bold text-emerald-400 tracking-tight"
         >
           <span className="text-xl">🌳</span>
           Orchard Tracker
@@ -62,7 +62,7 @@ export function NavBar() {
               Sprays
             </NavLink>
 
-            <div className="ml-3 flex items-center gap-2 border-l border-slate-200 pl-3">
+            <div className="ml-3 flex items-center gap-2 border-l border-slate-700 pl-3">
               <span
                 data-testid="navbar-user-name"
                 className="hidden text-sm text-slate-500 sm:block"
