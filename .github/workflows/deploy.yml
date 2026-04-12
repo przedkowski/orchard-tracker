@@ -36,12 +36,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy
-        run: fly deploy --remote-only
+      - uses: superfly/flyctl-actions@1.5
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        with:
+          args: deploy --remote-only
 
   deploy-web:
     name: Deploy → Vercel
