@@ -1,4 +1,7 @@
+import Groq from "groq-sdk";
+import { z } from "zod";
 import { prisma } from "../db.js";
+import { env } from "../env.js";
 
 export interface Suggestion {
   title: string;
@@ -6,6 +9,22 @@ export interface Suggestion {
   suggestedWindow: string;
   priority: "low" | "medium" | "high";
 }
+
+const suggestionSchema = z.object({
+  title: z.string(),
+  reason: z.string(),
+  suggestedWindow: z.string(),
+  priority: z.enum(["low", "medium", "high"]),
+});
+
+const suggestionsArraySchema = z.array(suggestionSchema).max(8);
+
+type SectionWithSprays = {
+  id: string;
+  name: string;
+  cropType: string;
+  sprays: Array<{ category: string; sprayedAt: Date; productName: string }>;
+};
 
 export async function getSuggestions(userId: string): Promise<Suggestion[]> {
   const sections = await prisma.orchardSection.findMany({
@@ -30,17 +49,67 @@ export async function getSuggestions(userId: string): Promise<Suggestion[]> {
     ];
   }
 
+  if (env.GROQ_API_KEY) {
+    try {
+      return await groqSuggestions(sections);
+    } catch {
+      // fall through to rule-based
+    }
+  }
+
   return ruleBasedSuggestions(sections);
 }
 
-function ruleBasedSuggestions(
-  sections: Array<{
-    id: string;
-    name: string;
-    cropType: string;
-    sprays: Array<{ category: string; sprayedAt: Date; productName: string }>;
-  }>,
-): Suggestion[] {
+async function groqSuggestions(
+  sections: SectionWithSprays[],
+): Promise<Suggestion[]> {
+  const client = new Groq({ apiKey: env.GROQ_API_KEY });
+
+  const context = sections.map((s) => ({
+    name: s.name,
+    cropType: s.cropType,
+    recentSprays: s.sprays.map((sp) => ({
+      product: sp.productName,
+      category: sp.category,
+      daysAgo: Math.floor(
+        (Date.now() - sp.sprayedAt.getTime()) / (1000 * 60 * 60 * 24),
+      ),
+    })),
+  }));
+
+  const response = await client.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    response_format: { type: "json_object" },
+    temperature: 0.4,
+    max_tokens: 1024,
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are an expert orchard spray advisor. " +
+          "Given a grower's orchard sections and their recent spray history, " +
+          "return a JSON object with a single key \"suggestions\" containing an array of up to 5 actionable spray suggestions. " +
+          "Each suggestion must have: " +
+          "title (string), reason (string), suggestedWindow (string), priority (\"low\"|\"medium\"|\"high\"). " +
+          "Base advice on typical integrated pest management (IPM) intervals. " +
+          "Return ONLY the JSON object, no markdown, no explanation.",
+      },
+      {
+        role: "user",
+        content: JSON.stringify(context),
+      },
+    ],
+  });
+
+  const raw = response.choices[0]?.message?.content ?? "{}";
+  const parsed = JSON.parse(raw);
+  const validated = suggestionsArraySchema.parse(
+    Array.isArray(parsed) ? parsed : parsed.suggestions,
+  );
+  return validated;
+}
+
+function ruleBasedSuggestions(sections: SectionWithSprays[]): Suggestion[] {
   const suggestions: Suggestion[] = [];
   const now = new Date();
   const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;

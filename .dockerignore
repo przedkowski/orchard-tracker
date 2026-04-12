@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+apps/*/dist
+.env
+.env.*
+!.env.example
+*.log
+.git
+.gitignore
+# Web source not needed in the API image
+apps/web/src
+apps/web/public
+apps/web/index.html
+apps/web/vite.config.ts
+apps/web/tsconfig*.json
+apps/web/postcss.config.js
+apps/web/tailwind.config.js

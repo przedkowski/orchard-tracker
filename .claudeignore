@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+.next/
+.vercel/
+.turbo/
+apps/*/dist/
+apps/*/build/
+packages/*/dist/
+
+# Lockfiles (huge, rarely useful as context)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Prisma generated client
+apps/api/node_modules/.prisma/
+**/.prisma/
+**/generated/
+
+# Env & secrets — never let Claude read these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Test & coverage output (you'll add these later)
+coverage/
+playwright-report/
+test-results/
+.nyc_output/
+
+# Caches
+.cache/
+.eslintcache
+.parcel-cache/
+*.tsbuildinfo
