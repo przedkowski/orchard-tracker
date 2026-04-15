@@ -6,9 +6,15 @@ import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { Combobox } from "../components/Combobox";
+import { Tabs } from "../components/Tabs";
 import { listSections, createSection, deleteSection } from "../api/sections";
 import { HttpError } from "../api/client";
 import { CROP_TYPES } from "../constants/cropTypes";
+
+const SECTION_TABS = [
+  { id: "add", label: "Add section" },
+  { id: "list", label: "All sections" },
+];
 
 export function Sections() {
   const queryClient = useQueryClient();
@@ -17,6 +23,8 @@ export function Sections() {
     queryKey: ["sections"],
     queryFn: listSections,
   });
+
+  const [activeTab, setActiveTab] = useState("add");
 
   const [name, setName] = useState("");
   const [cropType, setCropType] = useState("");
@@ -75,7 +83,7 @@ export function Sections() {
   return (
     <div data-testid="sections-page" className="min-h-screen bg-slate-950">
       <NavBar />
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8">
           <h1
             data-testid="sections-heading"
@@ -88,76 +96,96 @@ export function Sections() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-          <Card data-testid="sections-create-card">
+        <Tabs
+          tabs={SECTION_TABS}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          data-testid="sections-tabs"
+        />
+
+        {activeTab === "add" && (
+          <>
             <h2 className="mb-5 text-base font-semibold text-slate-200">
               Add new section
             </h2>
-            <form
-              onSubmit={handleCreate}
-              data-testid="sections-create-form"
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-              noValidate
-            >
-              <Input
-                label="Name"
-                name="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                data-testid="sections-name-input"
-              />
-              <Combobox
-                label="Crop type"
-                name="cropType"
-                required
-                value={cropType}
-                onChange={setCropType}
-                suggestions={CROP_TYPES}
-                data-testid="sections-croptype-input"
-              />
-              <Input
-                label="Area (ha)"
-                name="areaHa"
-                type="number"
-                min="0.01"
-                step="0.01"
-                required
-                value={areaHa}
-                onChange={(e) => setAreaHa(e.target.value)}
-                data-testid="sections-areaha-input"
-              />
-              <Input
-                label="Notes (optional)"
-                name="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                data-testid="sections-notes-input"
-              />
+            <Card data-testid="sections-create-card">
+              <form
+                onSubmit={handleCreate}
+                data-testid="sections-create-form"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                noValidate
+              >
+                <Input
+                  label="Name"
+                  name="name"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  data-testid="sections-name-input"
+                />
+                <Combobox
+                  label="Crop type"
+                  name="cropType"
+                  required
+                  value={cropType}
+                  onChange={setCropType}
+                  suggestions={CROP_TYPES}
+                  data-testid="sections-croptype-input"
+                />
+                <Input
+                  label="Area (ha)"
+                  name="areaHa"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  required
+                  value={areaHa}
+                  onChange={(e) => setAreaHa(e.target.value)}
+                  data-testid="sections-areaha-input"
+                />
+                <Input
+                  label="Notes (optional)"
+                  name="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  data-testid="sections-notes-input"
+                />
 
-              {formError && (
-                <p
-                  data-testid="sections-form-error"
-                  className="col-span-full rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
-                  role="alert"
-                >
-                  {formError}
-                </p>
+                {formError && (
+                  <p
+                    data-testid="sections-form-error"
+                    className="col-span-full rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
+                    role="alert"
+                  >
+                    {formError}
+                  </p>
+                )}
+
+                <div className="col-span-full">
+                  <Button
+                    type="submit"
+                    disabled={createMutation.isPending}
+                    data-testid="sections-create-submit"
+                  >
+                    {createMutation.isPending ? "Adding…" : "Add section"}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          </>
+        )}
+
+        {activeTab === "list" && (
+          <>
+            <h2 className="mb-5 text-base font-semibold text-slate-200">
+              Your sections
+              {sections.length > 0 && (
+                <span className="ml-2 text-sm font-normal text-slate-500">
+                  ({sections.length})
+                </span>
               )}
+            </h2>
 
-              <div className="col-span-full">
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending}
-                  data-testid="sections-create-submit"
-                >
-                  {createMutation.isPending ? "Adding…" : "Add section"}
-                </Button>
-              </div>
-            </form>
-          </Card>
-
-          <div>
             {deleteError && (
               <p
                 data-testid="sections-delete-error"
@@ -186,7 +214,7 @@ export function Sections() {
 
             {sectionsQuery.isSuccess && sections.length === 0 && (
               <p data-testid="sections-empty" className="text-sm text-slate-500">
-                No sections yet. Add one to the left.
+                No sections yet. Add one in the Add section tab.
               </p>
             )}
 
@@ -219,24 +247,33 @@ export function Sections() {
                             </p>
                           )}
                         </div>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          data-testid={`section-delete-${section.id}`}
-                          onClick={() => deleteMutation.mutate(section.id)}
-                          disabled={deleteMutation.isPending}
-                          className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
-                        >
-                          Delete
-                        </Button>
+                        <div className="flex shrink-0 gap-2">
+                          <Link
+                            to={`/sections/${section.id}`}
+                            data-testid={`section-edit-${section.id}`}
+                            className="inline-flex h-8 items-center rounded-lg border border-slate-600 bg-slate-800 px-3 text-xs font-medium text-slate-200 transition-colors hover:bg-slate-700"
+                          >
+                            Edit
+                          </Link>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            data-testid={`section-delete-${section.id}`}
+                            onClick={() => deleteMutation.mutate(section.id)}
+                            disabled={deleteMutation.isPending}
+                            className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
+                          >
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </Card>
                   </li>
                 ))}
               </ul>
             )}
-          </div>
-        </div>
+          </>
+        )}
       </main>
     </div>
   );

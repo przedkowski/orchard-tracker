@@ -57,6 +57,38 @@ export async function createSpray(
   return spray;
 }
 
+export async function updateSpray(
+  userId: string,
+  sprayId: string,
+  input: {
+    sectionId?: string;
+    productName?: string;
+    category?: string;
+    doseLPerHa?: number;
+    sprayedAt?: Date;
+    weatherNote?: string | null;
+    notes?: string | null;
+    phiDays?: number | null;
+  },
+) {
+  await getSpray(userId, sprayId);
+  if (input.sectionId) {
+    const section = await prisma.orchardSection.findFirst({
+      where: { id: input.sectionId, userId },
+    });
+    if (!section) throw new NotFoundError("Section not found");
+  }
+  const spray = await prisma.sprayRecord.update({
+    where: { id: sprayId },
+    data: input,
+    include: { section: { select: { id: true, name: true, cropType: true } } },
+  });
+  if (input.productName && input.category) {
+    await autoSaveProduct(userId, input.productName, input.category);
+  }
+  return spray;
+}
+
 export async function deleteSpray(userId: string, sprayId: string) {
   await getSpray(userId, sprayId);
   await prisma.sprayRecord.delete({ where: { id: sprayId } });

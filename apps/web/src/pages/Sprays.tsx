@@ -7,10 +7,18 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { PhiBadge } from "../components/PhiBadge";
 import { Combobox } from "../components/Combobox";
+import { Tabs } from "../components/Tabs";
+import { EditSprayModal } from "../components/EditSprayModal";
 import { listSections } from "../api/sections";
 import { listProducts } from "../api/products";
 import { listSprays, createSpray, deleteSpray } from "../api/sprays";
 import { HttpError } from "../api/client";
+import type { SprayRecord } from "../types";
+
+const SPRAY_TABS = [
+  { id: "add", label: "Log spray" },
+  { id: "list", label: "Records" },
+];
 
 const CATEGORIES = ["Fungicide", "Insecticide", "Herbicide", "Fertilizer", "Other"];
 
@@ -22,6 +30,8 @@ const selectClass =
 export function Sprays() {
   const queryClient = useQueryClient();
 
+  const [activeTab, setActiveTab] = useState("add");
+  const [editingSpray, setEditingSpray] = useState<SprayRecord | null>(null);
   const [filterSectionId, setFilterSectionId] = useState("");
   const filters = filterSectionId ? { sectionId: filterSectionId } : undefined;
 
@@ -111,8 +121,14 @@ export function Sprays() {
 
   return (
     <div data-testid="sprays-page" className="min-h-screen bg-slate-950">
+      {editingSpray && (
+        <EditSprayModal
+          spray={editingSpray}
+          onClose={() => setEditingSpray(null)}
+        />
+      )}
       <NavBar />
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
             <h1
@@ -134,34 +150,188 @@ export function Sprays() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-          <Card data-testid="sprays-create-card">
+        <Tabs
+          tabs={SPRAY_TABS}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          data-testid="sprays-tabs"
+        />
+
+        {activeTab === "add" && (
+          <>
             <h2 className="mb-5 text-base font-semibold text-slate-200">
               Log new spray
             </h2>
-            <form
-              onSubmit={handleCreate}
-              data-testid="sprays-create-form"
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-              noValidate
-            >
+            <Card data-testid="sprays-create-card">
+              <form
+                onSubmit={handleCreate}
+                data-testid="sprays-create-form"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                noValidate
+              >
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="spray-section"
+                    className="text-sm font-medium text-slate-300"
+                  >
+                    Section
+                  </label>
+                  <select
+                    id="spray-section"
+                    name="sectionId"
+                    required
+                    value={sectionId}
+                    onChange={(e) => setSectionId(e.target.value)}
+                    data-testid="sprays-section-select"
+                    className={selectClass}
+                  >
+                    <option value="">Select a section…</option>
+                    {sections.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <Combobox
+                  label="Product name"
+                  name="productName"
+                  required
+                  value={productName}
+                  onChange={setProductName}
+                  suggestions={(productsQuery.data ?? [])
+                    .filter((p) => p.category === category)
+                    .map((p) => p.name)}
+                  data-testid="sprays-product-input"
+                />
+
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="spray-category"
+                    className="text-sm font-medium text-slate-300"
+                  >
+                    Category
+                  </label>
+                  <select
+                    id="spray-category"
+                    name="category"
+                    required
+                    value={category}
+                    onChange={(e) => { setCategory(e.target.value); setProductName(""); }}
+                    data-testid="sprays-category-select"
+                    className={selectClass}
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <Input
+                  label="Dose (L/ha)"
+                  name="doseLPerHa"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  required
+                  value={doseLPerHa}
+                  onChange={(e) => setDoseLPerHa(e.target.value)}
+                  data-testid="sprays-dose-input"
+                />
+
+                <Input
+                  label="Date sprayed"
+                  name="sprayedAt"
+                  type="date"
+                  required
+                  value={sprayedAt}
+                  onChange={(e) => setSprayedAt(e.target.value)}
+                  data-testid="sprays-date-input"
+                />
+
+                <Input
+                  label="Weather note (optional)"
+                  name="weatherNote"
+                  value={weatherNote}
+                  onChange={(e) => setWeatherNote(e.target.value)}
+                  data-testid="sprays-weather-input"
+                />
+
+                <Input
+                  label="PHI (days, optional)"
+                  name="phiDays"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 14"
+                  value={phiDays}
+                  onChange={(e) => setPhiDays(e.target.value)}
+                  data-testid="sprays-phi-input"
+                />
+
+                <div className="sm:col-span-2">
+                  <Input
+                    label="Notes (optional)"
+                    name="notes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    data-testid="sprays-notes-input"
+                  />
+                </div>
+
+                {formError && (
+                  <p
+                    data-testid="sprays-form-error"
+                    className="col-span-full rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
+                    role="alert"
+                  >
+                    {formError}
+                  </p>
+                )}
+
+                <div className="col-span-full">
+                  <Button
+                    type="submit"
+                    disabled={createMutation.isPending}
+                    data-testid="sprays-create-submit"
+                  >
+                    {createMutation.isPending ? "Logging…" : "Log spray"}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          </>
+        )}
+
+        {activeTab === "list" && (
+          <>
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <h2 className="text-base font-semibold text-slate-200">
+                Spray records
+                {sprays.length > 0 && (
+                  <span className="ml-2 text-sm font-normal text-slate-500">
+                    ({sprays.length})
+                  </span>
+                )}
+              </h2>
               <div className="flex flex-col gap-1.5">
                 <label
-                  htmlFor="spray-section"
-                  className="text-sm font-medium text-slate-300"
+                  htmlFor="filter-section"
+                  className="text-xs font-medium text-slate-400"
                 >
-                  Section
+                  Filter by section
                 </label>
                 <select
-                  id="spray-section"
-                  name="sectionId"
-                  required
-                  value={sectionId}
-                  onChange={(e) => setSectionId(e.target.value)}
-                  data-testid="sprays-section-select"
-                  className={selectClass}
+                  id="filter-section"
+                  value={filterSectionId}
+                  onChange={(e) => setFilterSectionId(e.target.value)}
+                  data-testid="sprays-section-filter"
+                  className={`${selectClass} w-44`}
                 >
-                  <option value="">Select a section…</option>
+                  <option value="">All sections</option>
                   {sections.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
@@ -169,139 +339,6 @@ export function Sprays() {
                   ))}
                 </select>
               </div>
-
-              <Combobox
-                label="Product name"
-                name="productName"
-                required
-                value={productName}
-                onChange={setProductName}
-                suggestions={(productsQuery.data ?? [])
-                  .filter((p) => p.category === category)
-                  .map((p) => p.name)}
-                data-testid="sprays-product-input"
-              />
-
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="spray-category"
-                  className="text-sm font-medium text-slate-300"
-                >
-                  Category
-                </label>
-                <select
-                  id="spray-category"
-                  name="category"
-                  required
-                  value={category}
-                  onChange={(e) => { setCategory(e.target.value); setProductName(""); }}
-                  data-testid="sprays-category-select"
-                  className={selectClass}
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <Input
-                label="Dose (L/ha)"
-                name="doseLPerHa"
-                type="number"
-                min="0.01"
-                step="0.01"
-                required
-                value={doseLPerHa}
-                onChange={(e) => setDoseLPerHa(e.target.value)}
-                data-testid="sprays-dose-input"
-              />
-
-              <Input
-                label="Date sprayed"
-                name="sprayedAt"
-                type="date"
-                required
-                value={sprayedAt}
-                onChange={(e) => setSprayedAt(e.target.value)}
-                data-testid="sprays-date-input"
-              />
-
-              <Input
-                label="Weather note (optional)"
-                name="weatherNote"
-                value={weatherNote}
-                onChange={(e) => setWeatherNote(e.target.value)}
-                data-testid="sprays-weather-input"
-              />
-
-              <Input
-                label="PHI (days, optional)"
-                name="phiDays"
-                type="number"
-                min="1"
-                step="1"
-                placeholder="e.g. 14"
-                value={phiDays}
-                onChange={(e) => setPhiDays(e.target.value)}
-                data-testid="sprays-phi-input"
-              />
-
-              <div className="sm:col-span-2">
-                <Input
-                  label="Notes (optional)"
-                  name="notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  data-testid="sprays-notes-input"
-                />
-              </div>
-
-              {formError && (
-                <p
-                  data-testid="sprays-form-error"
-                  className="col-span-full rounded-lg bg-red-950/50 px-3 py-2 text-sm text-red-400"
-                  role="alert"
-                >
-                  {formError}
-                </p>
-              )}
-
-              <div className="col-span-full">
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending}
-                  data-testid="sprays-create-submit"
-                >
-                  {createMutation.isPending ? "Logging…" : "Log spray"}
-                </Button>
-              </div>
-            </form>
-          </Card>
-
-          <div>
-            <div className="mb-5 flex flex-col gap-1.5">
-              <label
-                htmlFor="filter-section"
-                className="text-sm font-medium text-slate-300"
-              >
-                Filter by section
-              </label>
-              <select
-                id="filter-section"
-                value={filterSectionId}
-                onChange={(e) => setFilterSectionId(e.target.value)}
-                data-testid="sprays-section-filter"
-                className={selectClass}
-              >
-                <option value="">All sections</option>
-                {sections.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {deleteError && (
@@ -372,24 +409,34 @@ export function Sprays() {
                             />
                           )}
                         </div>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          data-testid={`spray-delete-${spray.id}`}
-                          onClick={() => deleteMutation.mutate(spray.id)}
-                          disabled={deleteMutation.isPending}
-                          className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
-                        >
-                          Delete
-                        </Button>
+                        <div className="flex shrink-0 gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            data-testid={`spray-edit-${spray.id}`}
+                            onClick={() => setEditingSpray(spray)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            data-testid={`spray-delete-${spray.id}`}
+                            onClick={() => deleteMutation.mutate(spray.id)}
+                            disabled={deleteMutation.isPending}
+                            className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
+                          >
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </Card>
                   </li>
                 ))}
               </ul>
             )}
-          </div>
-        </div>
+          </>
+        )}
       </main>
     </div>
   );

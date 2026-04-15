@@ -4,6 +4,7 @@ import {
   listSprays,
   getSpray,
   createSpray,
+  updateSpray,
   deleteSpray,
   batchCreateSprays,
 } from "../services/sprays.service.js";
@@ -90,6 +91,29 @@ export async function spraysRoutes(app: FastifyInstance) {
     try {
       const result = await batchCreateSprays(request.userId, parsed.data);
       return reply.code(201).send(result);
+    } catch (err) {
+      if (err instanceof NotFoundError)
+        return reply.code(404).send({ error: err.message });
+      throw err;
+    }
+  });
+
+  const updateBody = createBody.partial().extend({
+    weatherNote: z.string().max(500).nullable().optional(),
+    notes: z.string().max(1000).nullable().optional(),
+    phiDays: z.number().int().positive().nullable().optional(),
+  });
+
+  app.patch("/sprays/:id", async (request, reply) => {
+    const { id } = idParam.parse(request.params);
+    const parsed = updateBody.safeParse(request.body);
+    if (!parsed.success) {
+      return reply
+        .code(400)
+        .send({ error: "Invalid input", details: parsed.error.flatten() });
+    }
+    try {
+      return await updateSpray(request.userId, id, parsed.data);
     } catch (err) {
       if (err instanceof NotFoundError)
         return reply.code(404).send({ error: err.message });

@@ -26,6 +26,22 @@ export function createSpray(input: {
   return apiRequest<SprayRecord>("/sprays", { method: "POST", body: input });
 }
 
+export function updateSpray(
+  id: string,
+  input: {
+    sectionId?: string;
+    productName?: string;
+    category?: string;
+    doseLPerHa?: number;
+    sprayedAt?: string;
+    weatherNote?: string | null;
+    notes?: string | null;
+    phiDays?: number | null;
+  },
+) {
+  return apiRequest<SprayRecord>(`/sprays/${id}`, { method: "PATCH", body: input });
+}
+
 export function deleteSpray(id: string) {
   return apiRequest<void>(`/sprays/${id}`, { method: "DELETE" });
 }

@@ -20,6 +20,9 @@ const priorityColors: Record<string, string> = {
 export function Dashboard() {
   const { user } = useAuth();
   const [applyingSuggestion, setApplyingSuggestion] = useState<Suggestion | null>(null);
+  const [sortByUrgency, setSortByUrgency] = useState(false);
+
+  const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 
   const sectionsQuery = useQuery({
     queryKey: ["sections"],
@@ -172,9 +175,23 @@ export function Dashboard() {
           </section>
 
           <section data-testid="dashboard-suggestions">
-            <h2 className="mb-3 text-base font-semibold text-slate-200">
-              Suggestions
-            </h2>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-base font-semibold text-slate-200">
+                Suggestions
+              </h2>
+              <button
+                type="button"
+                data-testid="suggestions-sort-toggle"
+                onClick={() => setSortByUrgency((v) => !v)}
+                className={`text-xs font-medium transition-colors ${
+                  sortByUrgency
+                    ? "text-emerald-400"
+                    : "text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                {sortByUrgency ? "Sorted by urgency ✓" : "Sort by urgency"}
+              </button>
+            </div>
             {suggestionsQuery.isLoading && (
               <p
                 data-testid="dashboard-suggestions-loading"
@@ -195,7 +212,13 @@ export function Dashboard() {
             {suggestionsQuery.isSuccess &&
               (suggestionsQuery.data?.suggestions.length ?? 0) > 0 && (
                 <ul className="flex flex-col gap-2">
-                  {suggestionsQuery.data!.suggestions.map((s, i) => (
+                  {[...(suggestionsQuery.data!.suggestions)]
+                    .sort((a, b) =>
+                      sortByUrgency
+                        ? PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
+                        : 0,
+                    )
+                    .map((s, i) => (
                     <li key={i}>
                       <Card data-testid={`suggestion-item-${i}`} className="py-3">
                         <div className="flex items-start justify-between gap-3">
