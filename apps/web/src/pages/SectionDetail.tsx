@@ -7,10 +7,12 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { PhiBadge } from "../components/PhiBadge";
 import { Combobox } from "../components/Combobox";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { CROP_TYPES } from "../constants/cropTypes";
 import { getSection, updateSection } from "../api/sections";
 import { listSprays, deleteSpray } from "../api/sprays";
 import { HttpError } from "../api/client";
+import { useToast } from "../hooks/useToast";
 import type { OrchardSection, SprayRecord } from "../types";
 
 // Computes the most restrictive active PHI across all sprays for this section.
@@ -81,6 +83,7 @@ function EditSectionForm({
   onDone: () => void;
 }) {
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
   const [name, setName] = useState(section.name);
   const [cropType, setCropType] = useState(section.cropType);
   const [areaHa, setAreaHa] = useState(String(section.areaHa));
@@ -94,6 +97,7 @@ function EditSectionForm({
       queryClient.invalidateQueries({ queryKey: ["section", section.id] });
       queryClient.invalidateQueries({ queryKey: ["sections"] });
       setFormError(null);
+      addToast("Section updated");
       onDone();
     },
     onError: (err) => {
@@ -194,6 +198,7 @@ export function SectionDetail() {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const sectionQuery = useQuery({
     queryKey: ["section", id],
@@ -228,6 +233,14 @@ export function SectionDetail() {
 
   return (
     <div data-testid="section-detail-page" className="min-h-screen bg-slate-950">
+      {pendingDeleteId && (
+        <ConfirmDialog
+          message="Delete this spray record? This cannot be undone."
+          onConfirm={() => { deleteSprayMutation.mutate(pendingDeleteId); setPendingDeleteId(null); }}
+          onCancel={() => setPendingDeleteId(null)}
+          data-testid="section-spray-delete-confirm"
+        />
+      )}
       <NavBar />
       <main className="mx-auto max-w-3xl px-4 py-8">
         <Link
@@ -389,9 +402,7 @@ export function SectionDetail() {
                             variant="secondary"
                             size="sm"
                             data-testid={`section-spray-delete-${spray.id}`}
-                            onClick={() =>
-                              deleteSprayMutation.mutate(spray.id)
-                            }
+                            onClick={() => setPendingDeleteId(spray.id)}
                             disabled={deleteSprayMutation.isPending}
                             className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
                           >

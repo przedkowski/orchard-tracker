@@ -7,9 +7,11 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { Combobox } from "../components/Combobox";
 import { Tabs } from "../components/Tabs";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { listSections, createSection, deleteSection } from "../api/sections";
 import { HttpError } from "../api/client";
 import { CROP_TYPES } from "../constants/cropTypes";
+import { useToast } from "../hooks/useToast";
 
 const SECTION_TABS = [
   { id: "add", label: "Add section" },
@@ -24,7 +26,9 @@ export function Sections() {
     queryFn: listSections,
   });
 
+  const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState("add");
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [cropType, setCropType] = useState("");
@@ -42,6 +46,7 @@ export function Sections() {
       setAreaHa("");
       setNotes("");
       setFormError(null);
+      addToast("Section added");
     },
     onError: (err) => {
       if (err instanceof HttpError) {
@@ -82,6 +87,14 @@ export function Sections() {
 
   return (
     <div data-testid="sections-page" className="min-h-screen bg-slate-950">
+      {pendingDeleteId && (
+        <ConfirmDialog
+          message="Delete this section? All its spray records will also be deleted."
+          onConfirm={() => { deleteMutation.mutate(pendingDeleteId); setPendingDeleteId(null); }}
+          onCancel={() => setPendingDeleteId(null)}
+          data-testid="section-delete-confirm"
+        />
+      )}
       <NavBar />
       <main className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8">
@@ -259,7 +272,7 @@ export function Sections() {
                             variant="secondary"
                             size="sm"
                             data-testid={`section-delete-${section.id}`}
-                            onClick={() => deleteMutation.mutate(section.id)}
+                            onClick={() => setPendingDeleteId(section.id)}
                             disabled={deleteMutation.isPending}
                             className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
                           >

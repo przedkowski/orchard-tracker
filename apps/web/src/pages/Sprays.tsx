@@ -9,11 +9,13 @@ import { PhiBadge } from "../components/PhiBadge";
 import { Combobox } from "../components/Combobox";
 import { Tabs } from "../components/Tabs";
 import { EditSprayModal } from "../components/EditSprayModal";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { listSections } from "../api/sections";
 import { listProducts } from "../api/products";
 import { listSprays, createSpray, deleteSpray } from "../api/sprays";
 import { HttpError } from "../api/client";
 import type { SprayRecord } from "../types";
+import { useToast } from "../hooks/useToast";
 
 const SPRAY_TABS = [
   { id: "add", label: "Log spray" },
@@ -30,8 +32,10 @@ const selectClass =
 export function Sprays() {
   const queryClient = useQueryClient();
 
+  const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState("add");
   const [editingSpray, setEditingSpray] = useState<SprayRecord | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [filterSectionId, setFilterSectionId] = useState("");
   const filters = filterSectionId ? { sectionId: filterSectionId } : undefined;
 
@@ -76,6 +80,7 @@ export function Sprays() {
       setNotes("");
       setPhiDays("");
       setFormError(null);
+      addToast("Spray logged");
     },
     onError: (err) => {
       if (err instanceof HttpError) {
@@ -121,6 +126,14 @@ export function Sprays() {
 
   return (
     <div data-testid="sprays-page" className="min-h-screen bg-slate-950">
+      {pendingDeleteId && (
+        <ConfirmDialog
+          message="Delete this spray record? This cannot be undone."
+          onConfirm={() => { deleteMutation.mutate(pendingDeleteId); setPendingDeleteId(null); }}
+          onCancel={() => setPendingDeleteId(null)}
+          data-testid="spray-delete-confirm"
+        />
+      )}
       {editingSpray && (
         <EditSprayModal
           spray={editingSpray}
@@ -422,7 +435,7 @@ export function Sprays() {
                             variant="secondary"
                             size="sm"
                             data-testid={`spray-delete-${spray.id}`}
-                            onClick={() => deleteMutation.mutate(spray.id)}
+                            onClick={() => setPendingDeleteId(spray.id)}
                             disabled={deleteMutation.isPending}
                             className="text-red-400 hover:border-red-800 hover:bg-red-950/50"
                           >

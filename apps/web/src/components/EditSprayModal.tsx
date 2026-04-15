@@ -1,5 +1,6 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "../hooks/useToast";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import { Combobox } from "./Combobox";
@@ -23,6 +24,7 @@ interface Props {
 
 export function EditSprayModal({ spray, onClose }: Props) {
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
 
   const sectionsQuery = useQuery({ queryKey: ["sections"], queryFn: listSections });
   const productsQuery = useQuery({ queryKey: ["products"], queryFn: listProducts });
@@ -54,6 +56,7 @@ export function EditSprayModal({ spray, onClose }: Props) {
       updateSpray(spray.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sprays"] });
+      addToast("Spray updated");
       onClose();
     },
     onError: (err) => {
