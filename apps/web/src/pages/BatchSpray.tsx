@@ -87,6 +87,13 @@ export default function BatchSpray() {
       setFormError("Select at least one section");
       return;
     }
+    const inLibrary = (productsQuery.data ?? []).some(
+      (p) => p.category === category && p.name.toLowerCase() === productName.trim().toLowerCase(),
+    );
+    if (!inLibrary) {
+      setFormError(`"${productName.trim()}" is not in your product library. Add it in Products first.`);
+      return;
+    }
     batchMutation.mutate({
       sectionIds: Array.from(selectedIds),
       productName: productName.trim(),

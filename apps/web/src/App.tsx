@@ -10,6 +10,7 @@ import { Sections } from "./pages/Sections";
 import { SectionDetail } from "./pages/SectionDetail";
 import { Sprays } from "./pages/Sprays";
 import BatchSpray from "./pages/BatchSpray";
+import Products from "./pages/Products";
 import { NotFound } from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ function App() {
               <Route path="/sections/:id" element={<SectionDetail />} />
               <Route path="/sprays" element={<Sprays />} />
               <Route path="/sprays/batch" element={<BatchSpray />} />
+              <Route path="/products" element={<Products />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

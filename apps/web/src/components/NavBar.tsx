@@ -61,6 +61,15 @@ export function NavBar() {
             >
               Sprays
             </NavLink>
+            <NavLink
+              to="/products"
+              data-testid="navbar-products-link"
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? linkActive : linkInactive}`
+              }
+            >
+              Products
+            </NavLink>
 
             <div className="ml-3 flex items-center gap-2 border-l border-slate-700 pl-3">
               <span

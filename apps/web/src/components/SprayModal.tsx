@@ -71,6 +71,13 @@ export function SprayModal({ suggestion, onClose }: Props) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(null);
+    const inLibrary = (productsQuery.data ?? []).some(
+      (p) => p.category === category && p.name.toLowerCase() === productName.trim().toLowerCase(),
+    );
+    if (!inLibrary) {
+      setFormError(`"${productName.trim()}" is not in your product library. Add it in Products first.`);
+      return;
+    }
     mutation.mutate({
       sectionId,
       productName: productName.trim(),
