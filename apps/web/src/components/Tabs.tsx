@@ -1,6 +1,8 @@
 interface Tab {
   id: string;
   label: string;
+  /** id of the associated tabpanel element */
+  panelId?: string;
 }
 
 interface Props {
@@ -20,9 +22,11 @@ export function Tabs({ tabs, activeTab, onChange, "data-testid": testid }: Props
       {tabs.map((tab) => (
         <button
           key={tab.id}
+          id={tab.panelId ? `${tab.panelId}-tab` : undefined}
           type="button"
           role="tab"
           aria-selected={activeTab === tab.id}
+          aria-controls={tab.panelId}
           data-testid={testid ? `${testid}-${tab.id}` : undefined}
           onClick={() => onChange(tab.id)}
           className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${

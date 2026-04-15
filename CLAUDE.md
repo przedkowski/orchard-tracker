@@ -34,21 +34,6 @@ later. Testability is a first-class requirement, not an afterthought.
 - Deploy: Fly.io (api) + Vercel (web)
 - Monitoring: Grafana Cloud
 
-## Gotchas — already hit, do not repeat
-
-- Paths with `&` or spaces break Node tooling on Windows.
-- Prisma 7 broke `url = env("DATABASE_URL")`. Stay on 6.16.1.
-- Vite 8 requires Node 20.19+.
-- Vite's TS template enables `erasableSyntaxOnly` — no parameter-property
-  shorthand in constructors.
-- Tailwind v4 changed config format. Stay on v3.
-- React 19 lint rule `react-hooks/set-state-in-effect` fires on setState
-  in effect bodies. Compute sync initial state in `useState` initializer
-  instead.
-- Fast Refresh rule `react-refresh/only-export-components`: context
-  objects go in their own non-`.tsx` file, hooks in their own file,
-  providers alone in the `.tsx` file.
-
 ## data-testid convention
 
 Every interactive element and every element a Playwright test might
@@ -74,8 +59,9 @@ Page-level containers also get testids: `sections-page`, `sections-list`,
 - `POST /api/auth/signup`, `POST /api/auth/signin`
 - `GET /api/auth/me` → `{ user: User }` (NOT `{ userId }`)
 - `CRUD /api/sections`
-- `CRUD + filter /api/sprays`
+- `CRUD + filter /api/sprays`, `PATCH /api/sprays/:id`
 - `GET /api/suggestions` → `{ suggestions: Suggestion[] }`
+- `CRUD /api/products`
 
 Section and spray ids are `string`, not number.
 
@@ -84,32 +70,54 @@ Section and spray ids are `string`, not number.
 - Pages use default exports.
 - Components (`Button`, `Input`, `Card`, `NavBar`) are named exports.
 - All components forward `data-testid`.
+- `Button` is a `forwardRef` component; defaults `type="button"`.
 - `Input` derives its error testid as `${testid}-error`.
-- `Button` defaults `type="button"`; set `type="submit"` explicitly inside forms.
 - Forms use real `<form>` with `noValidate` and handle `HttpError`
   (from `src/api/client`) with a form-level error message.
 - Auth: `src/context/auth-context.ts` (types/context, no JSX),
   `src/context/AuthContext.tsx` (provider only),
   `src/hooks/useAuth.ts` (hook). Split to satisfy fast-refresh rule.
+- Toasts: `src/context/toast-context.ts`, `src/context/ToastContext.tsx`,
+  `src/hooks/useToast.ts`. Same fast-refresh split pattern.
 - JWT stored in localStorage under key `orchard_token`.
 - Query keys: `["sections"]`, `["sprays", filters?]`, `["suggestions"]`,
-  `["section", id]`. Mutations invalidate the relevant keys on success.
+  `["section", id]`, `["products"]`. Mutations invalidate relevant keys on success.
+- `Tabs` accepts optional `panelId` per tab for `aria-controls` wiring.
+  Compliant pages wrap each active panel in `role="tabpanel"` + `aria-labelledby`.
+- Spray forms validate product name against library before mutation
+  (case-insensitive match on name + category). `EditSprayModal` is exempt.
 
-## What's still left (high-level)
+## WCAG 2.2 testing setup
 
-- Frontend pages: `Sections.tsx` ✅, `SectionDetail.tsx` ✅, `Sprays.tsx` ✅,
-  wire up `App.tsx` routing with AuthProvider + QueryClientProvider ✅
-- Replace rule-based suggestions with Groq integration
-- Deploy api (Fly.io) and web (Vercel)
-- GitHub Actions CI/CD
-- Grafana Cloud hookup
-- At least 8 distinct E2E user paths must be possible by the end
+**Compliant views:** `SignIn`, `SignUp`, `Sprays`, `Products`, `NotFound`.
+
+**4 intentionally non-compliant views** for Playwright accessibility testing.
+Each contains one violation per axe severity, marked with:
+
+```
+{/* wcag-violation: <severity> — <description> (WCAG X.X.X Level X) */}
+```
+
+| View | Critical | Serious | Moderate | Minor |
+|------|----------|---------|----------|-------|
+| `Dashboard` | `<img>` without `alt` | `text-slate-500` small-caps, ~3.4:1 contrast | unnamed `<section>` landmark | `tabIndex={0}` on non-interactive `<p>` |
+| `Sections` | `<img>` without `alt` in list items | `text-slate-600` subtitle, ~2.4:1 contrast | tab panels missing `role="tabpanel"` | redundant `role="list"` on `<ul>` |
+| `BatchSpray` | `<input>` without label | `text-slate-600` metadata, ~2.4:1 contrast | checkbox group without `<fieldset>` | `tabIndex={1}` on back link |
+| `SectionDetail` | icon-only button with no accessible name | `text-slate-600` meta text, ~2.4:1 contrast | unnamed `<section>` landmark | decorative emoji without `aria-hidden` |
 
 ## Implemented features
 
+- Auth (sign up / sign in / sign out) ✅
+- Orchard sections CRUD + detail view ✅
+- Spray records CRUD with per-section filtering ✅
 - Batch spray — log the same spray across multiple sections at once ✅
 - PHI tracker — Pre-Harvest Interval countdown badge + section-level safety banner ✅
-- Product & crop type autocomplete — DB-backed dictionaries with per-category filtering ✅
+- Product Library — CRUD UI; spray forms reject products not in library ✅
+- Crop type & product autocomplete — DB-backed dictionaries with per-category filtering ✅
+- Suggestions — rule-based, sortable by urgency, Apply button opens prefilled modal ✅
+- Edit sections and sprays ✅
+- Confirm dialogs on delete, toast notifications on success ✅
+- WCAG 2.2 partial compliance — 5 clean views, 4 intentionally broken for testing ✅
 
 ## Feature backlog (not yet started)
 

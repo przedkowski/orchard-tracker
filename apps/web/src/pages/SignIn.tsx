@@ -37,9 +37,9 @@ export function SignIn() {
       data-testid="signin-page"
       className="flex min-h-screen items-center justify-center bg-slate-950 p-4"
     >
-      <div className="w-full max-w-sm">
+      <main className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <span className="text-4xl">🌳</span>
+          <span className="text-4xl" aria-hidden="true">🌳</span>
           <h1 className="mt-2 text-2xl font-bold text-slate-50">
             Orchard Tracker
           </h1>
@@ -115,7 +115,7 @@ export function SignIn() {
             Create one
           </Link>
         </p>
-      </div>
+      </main>
     </div>
   );
 }

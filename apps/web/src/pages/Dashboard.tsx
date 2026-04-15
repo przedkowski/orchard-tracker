@@ -68,12 +68,17 @@ export function Dashboard() {
 
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card data-testid="dashboard-stat-sections" className="flex flex-col gap-1">
+            {/* wcag-violation: critical — img missing alt (WCAG 1.1.1 Level A) */}
+            <img src="/favicon.svg" className="mb-1 h-4 w-4" />
+            {/* wcag-violation: serious — text-slate-500 on bg-slate-900 ~3.4:1 contrast, fails 4.5:1 for text-xs (WCAG 1.4.3 Level AA) */}
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
               Sections
             </p>
+            {/* wcag-violation: minor — tabIndex on non-interactive element disrupts focus order (WCAG 2.4.3 Level A) */}
             <p
               data-testid="dashboard-stat-sections-value"
               className="text-3xl font-bold text-slate-50"
+              tabIndex={0}
             >
               {sectionCount}
             </p>
@@ -120,6 +125,7 @@ export function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* wcag-violation: moderate — <section> landmark has no accessible name (WCAG 1.3.1 Level A) */}
           <section data-testid="dashboard-recent-sprays">
             <h2 className="mb-3 text-base font-semibold text-slate-200">
               Recent sprays

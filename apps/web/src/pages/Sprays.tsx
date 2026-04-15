@@ -18,8 +18,8 @@ import type { SprayRecord } from "../types";
 import { useToast } from "../hooks/useToast";
 
 const SPRAY_TABS = [
-  { id: "add", label: "Log spray" },
-  { id: "list", label: "Records" },
+  { id: "add", label: "Log spray", panelId: "sprays-tab-add" },
+  { id: "list", label: "Records", panelId: "sprays-tab-list" },
 ];
 
 const CATEGORIES = ["Fungicide", "Insecticide", "Herbicide", "Fertilizer", "Other"];
@@ -178,7 +178,11 @@ export function Sprays() {
         />
 
         {activeTab === "add" && (
-          <>
+          <div
+            id="sprays-tab-add"
+            role="tabpanel"
+            aria-labelledby="sprays-tab-add-tab"
+          >
             <h2 className="mb-5 text-base font-semibold text-slate-200">
               Log new spray
             </h2>
@@ -323,11 +327,15 @@ export function Sprays() {
                 </div>
               </form>
             </Card>
-          </>
+          </div>
         )}
 
         {activeTab === "list" && (
-          <>
+          <div
+            id="sprays-tab-list"
+            role="tabpanel"
+            aria-labelledby="sprays-tab-list-tab"
+          >
             <div className="mb-5 flex items-end justify-between gap-4">
               <h2 className="text-base font-semibold text-slate-200">
                 Spray records
@@ -455,7 +463,7 @@ export function Sprays() {
                 ))}
               </ul>
             )}
-          </>
+          </div>
         )}
       </main>
     </div>

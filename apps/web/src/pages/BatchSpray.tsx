@@ -113,9 +113,11 @@ export default function BatchSpray() {
     <div data-testid="batch-spray-page" className="min-h-screen bg-slate-950">
       <NavBar />
       <main className="mx-auto max-w-3xl px-4 py-8">
+        {/* wcag-violation: minor — positive tabIndex disrupts natural focus order (WCAG 2.4.3 Level A) */}
         <Link
           to="/sprays"
           data-testid="batch-spray-back"
+          tabIndex={1}
           className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-emerald-400 hover:underline"
         >
           ← Back to sprays
@@ -140,6 +142,7 @@ export default function BatchSpray() {
           className="flex flex-col gap-6"
         >
           {/* Section picker */}
+          {/* wcag-violation: moderate — checkbox group lacks <fieldset>/<legend> grouping (WCAG 1.3.1, Level A) */}
           <Card>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-semibold text-slate-200">
@@ -206,7 +209,8 @@ export default function BatchSpray() {
                           <p className="text-sm font-medium text-slate-100">
                             {section.name}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          {/* wcag-violation: serious — text-slate-600 on dark bg ~2.4:1 contrast fails 4.5:1 (WCAG 1.4.3 Level AA) */}
+                          <p className="text-xs text-slate-600">
                             {section.cropType} · {section.areaHa} ha
                           </p>
                         </div>
@@ -234,6 +238,13 @@ export default function BatchSpray() {
               Spray details
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* wcag-violation: critical — input has no associated label (WCAG 1.3.1 / 4.1.2 Level A) */}
+              <input
+                type="text"
+                placeholder="Batch reference (optional)"
+                data-testid="batch-spray-reference-input"
+                className={selectClass}
+              />
               <Combobox
                 label="Product name"
                 name="productName"

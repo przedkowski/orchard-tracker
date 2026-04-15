@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../hooks/useToast";
 import { Button } from "./Button";
@@ -25,6 +25,8 @@ interface Props {
 export function EditSprayModal({ spray, onClose }: Props) {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
+  const firstFocusRef = useRef<HTMLSelectElement>(null);
+  const returnFocusRef = useRef<Element | null>(null);
 
   const sectionsQuery = useQuery({ queryKey: ["sections"], queryFn: listSections });
   const productsQuery = useQuery({ queryKey: ["products"], queryFn: listProducts });
@@ -44,11 +46,16 @@ export function EditSprayModal({ spray, onClose }: Props) {
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
+    returnFocusRef.current = document.activeElement;
+    firstFocusRef.current?.focus();
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    return () => {
+      document.removeEventListener("keydown", handler);
+      (returnFocusRef.current as HTMLElement | null)?.focus();
+    };
   }, [onClose]);
 
   const mutation = useMutation({
@@ -128,6 +135,7 @@ export function EditSprayModal({ spray, onClose }: Props) {
                 Section
               </label>
               <select
+                ref={firstFocusRef}
                 id="edit-modal-section"
                 required
                 value={sectionId}

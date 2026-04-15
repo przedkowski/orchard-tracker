@@ -20,6 +20,7 @@ export function NavBar() {
   return (
     <nav
       data-testid="navbar"
+      aria-label="Main navigation"
       className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/90 backdrop-blur-sm"
     >
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
@@ -28,7 +29,7 @@ export function NavBar() {
           data-testid="navbar-brand"
           className="flex items-center gap-2 text-base font-bold text-emerald-400 tracking-tight"
         >
-          <span className="text-xl">🌳</span>
+          <span className="text-xl" aria-hidden="true">🌳</span>
           Orchard Tracker
         </Link>
 

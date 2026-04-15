@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useId } from "react";
 import { Button } from "./Button";
 
 interface Props {
@@ -16,7 +16,11 @@ export function ConfirmDialog({
   onCancel,
   "data-testid": testid = "confirm-dialog",
 }: Props) {
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const msgId = useId();
+
   useEffect(() => {
+    confirmRef.current?.focus();
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onCancel();
     };
@@ -34,10 +38,12 @@ export function ConfirmDialog({
         data-testid={testid}
         role="alertdialog"
         aria-modal="true"
+        aria-describedby={msgId}
         className="w-full max-w-sm rounded-xl border border-slate-700 bg-slate-900 p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <p
+          id={msgId}
           data-testid={`${testid}-message`}
           className="mb-6 text-sm text-slate-200"
         >
@@ -45,6 +51,7 @@ export function ConfirmDialog({
         </p>
         <div className="flex gap-3">
           <Button
+            ref={confirmRef}
             data-testid={`${testid}-confirm`}
             onClick={onConfirm}
             className="bg-red-700 text-white hover:bg-red-600 border-red-700"

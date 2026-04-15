@@ -43,6 +43,7 @@ function PhiStatusBanner({ sprays }: { sprays: SprayRecord[] }) {
         data-testid="section-phi-banner"
         className="mb-6 flex items-start gap-3 rounded-xl border border-amber-700/50 bg-amber-900/20 px-4 py-3"
       >
+        {/* wcag-violation: minor — decorative emoji lacks aria-hidden, screen readers announce unicode name (WCAG 1.1.1 best practice) */}
         <span className="mt-0.5 text-lg">⚠️</span>
         <div>
           <p className="text-sm font-semibold text-amber-300">
@@ -282,9 +283,10 @@ export function SectionDetail() {
                     >
                       {section.name}
                     </h1>
+                    {/* wcag-violation: serious — text-slate-600 on bg-slate-900 ~2.4:1 contrast fails 4.5:1 (WCAG 1.4.3 Level AA) */}
                     <p
                       data-testid="section-detail-meta"
-                      className="mt-1 text-sm text-slate-400"
+                      className="mt-1 text-sm text-slate-600"
                     >
                       {section.cropType} · {section.areaHa} ha
                     </p>
@@ -297,13 +299,14 @@ export function SectionDetail() {
                       </p>
                     )}
                   </div>
+                  {/* wcag-violation: critical — button contains only an img without alt; no accessible name (WCAG 4.1.2 Level A) */}
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => setEditing(true)}
                     data-testid="section-detail-edit-button"
                   >
-                    Edit
+                    <img src="/favicon.svg" className="h-4 w-4" />
                   </Button>
                 </div>
               ) : (
@@ -316,6 +319,7 @@ export function SectionDetail() {
 
             <PhiStatusBanner sprays={sprays} />
 
+            {/* wcag-violation: moderate — <section> landmark has no accessible name (WCAG 1.3.1 Level A) */}
             <section>
               <h2
                 data-testid="section-sprays-heading"

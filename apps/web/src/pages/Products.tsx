@@ -13,8 +13,8 @@ import { useToast } from "../hooks/useToast";
 const CATEGORIES = ["Fungicide", "Insecticide", "Herbicide", "Fertilizer", "Other"];
 
 const PRODUCT_TABS = [
-  { id: "add", label: "Add product" },
-  { id: "library", label: "Library" },
+  { id: "add", label: "Add product", panelId: "products-tab-add" },
+  { id: "library", label: "Library", panelId: "products-tab-library" },
 ];
 
 const selectClass =
@@ -118,7 +118,11 @@ export default function Products() {
         />
 
         {activeTab === "add" && (
-          <>
+          <div
+            id="products-tab-add"
+            role="tabpanel"
+            aria-labelledby="products-tab-add-tab"
+          >
             <h2 className="mb-5 text-base font-semibold text-slate-200">
               Add product
             </h2>
@@ -178,11 +182,15 @@ export default function Products() {
                 </div>
               </form>
             </Card>
-          </>
+          </div>
         )}
 
         {activeTab === "library" && (
-          <>
+          <div
+            id="products-tab-library"
+            role="tabpanel"
+            aria-labelledby="products-tab-library-tab"
+          >
             <div className="mb-5 flex items-end justify-between gap-4">
               <h2 className="text-base font-semibold text-slate-200">
                 Library
@@ -274,7 +282,7 @@ export default function Products() {
                 ))}
               </ul>
             )}
-          </>
+          </div>
         )}
       </main>
     </div>

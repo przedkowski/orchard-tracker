@@ -104,7 +104,8 @@ export function Sections() {
           >
             Orchard Sections
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          {/* wcag-violation: serious — text-slate-600 on bg-slate-950 ~2.4:1 contrast fails 4.5:1 (WCAG 1.4.3 Level AA) */}
+          <p className="mt-1 text-sm text-slate-600">
             Manage your orchard areas and crop types.
           </p>
         </div>
@@ -116,6 +117,7 @@ export function Sections() {
           data-testid="sections-tabs"
         />
 
+        {/* wcag-violation: moderate — tab panels missing role="tabpanel" and aria-labelledby (WCAG 4.1.2 Level A) */}
         {activeTab === "add" && (
           <>
             <h2 className="mb-5 text-base font-semibold text-slate-200">
@@ -231,8 +233,10 @@ export function Sections() {
               </p>
             )}
 
+            {/* wcag-violation: critical — img without alt inside section card (WCAG 1.1.1 Level A) */}
+            {/* wcag-violation: minor — role="list" on <ul> is redundant (WCAG best practice) */}
             {sectionsQuery.isSuccess && sections.length > 0 && (
-              <ul data-testid="sections-list" className="flex flex-col gap-3">
+              <ul data-testid="sections-list" role="list" className="flex flex-col gap-3">
                 {sections.map((section) => (
                   <li key={section.id}>
                     <Card
@@ -241,6 +245,7 @@ export function Sections() {
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0 flex-1">
+                          <img src="/favicon.svg" className="mb-1 h-3 w-3 inline mr-1" />
                           <Link
                             to={`/sections/${section.id}`}
                             data-testid={`section-link-${section.id}`}
